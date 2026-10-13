@@ -16,6 +16,8 @@
 
 ## 放到 GitHub Pages
 
+**最少只需要 `index.html` 一个文件**：词库已经写在里面。`icons/`、`manifest.webmanifest`、`sw.js` 用于装到主屏幕和离线使用，建议一起上传，缺了也不影响学习。
+
 1. 把这个文件夹里的所有文件放进一个仓库（或现有 Pages 仓库的一个子文件夹，例如 `vocab/`）。
 2. 仓库 Settings → Pages → 选择分支（通常是 `main`）和根目录，保存。
 3. 一两分钟后打开 `https://<用户名>.github.io/<仓库名>/`（子文件夹就在后面加 `vocab/`）。
@@ -25,7 +27,7 @@
 | 文件 | 作用 |
 |---|---|
 | `index.html` | 整个应用（界面、逻辑、样式） |
-| `data/*.json` | 内置词库，每个语言每个级别一个文件 |
+| `data/*.json` | 内置词库的原始文件（已经写进 `index.html`，上传时可以不传；改词库后需要重新生成 `index.html`） |
 | `manifest.webmanifest`、`icons/` | 装到主屏幕用的名称和图标 |
 | `sw.js` | 离线缓存 |
 | `logo/` | Logo 原文件：单独图标（mark.svg）、横版标志（浅色 / 深色，SVG 和 PNG）、1024 像素大图 |
