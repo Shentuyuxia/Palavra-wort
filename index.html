@@ -1,0 +1,1502 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Palavra &amp; Wort</title>
+<meta name="description" content="私人分级词汇闪卡：巴西葡语、德语、英语">
+<meta name="theme-color" content="#16785a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Palavra">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600&family=Schibsted+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: header with language switch + today's check-in strip; six tabs; main work column with a settings/notes aside. Accent follows the language: green for Portuguese, indigo for German, amber for English. */
+:root{
+  --bg:#f2f1ec; --surface:#fcfbf8; --sunk:#e8e6df; --ink:#1c1e21; --muted:#62656a; --line:#d8d5cc;
+  --pt:#16785a; --pt-soft:#d9eee5; --de:#3f50b0; --de-soft:#e0e3f6; --en:#a2560a; --en-soft:#f6e6d2; --on-acc:#ffffff;
+  --der:#2e6db3; --die:#bf3a2f; --das:#2b8549;
+  --a1:#4a8a2a; --a2:#23847f; --b1:#2e6db3; --b2:#7650b0; --c1:#a6386b;
+  --ok:#1d7a4e; --ok-soft:#dbeee2; --warn:#a05b00; --warn-soft:#f5e6cd; --bad:#b0281f; --bad-soft:#f6dcd9;
+  --scrim:rgba(20,22,25,.45);
+  --f-word:"Literata", Georgia, "Songti SC", "Noto Serif SC", serif;
+  --f-ui:"Schibsted Grotesk", "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+  --r:12px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root{
+  --bg:#121417; --surface:#1a1d21; --sunk:#0e1013; --ink:#e7e8ea; --muted:#9a9ea5; --line:#2c3036;
+  --pt:#5cc6a0; --pt-soft:#173a2f; --de:#8f9cf0; --de-soft:#23284a; --en:#eba65c; --en-soft:#3b2914; --on-acc:#0d1110;
+  --der:#7fb0ef; --die:#f2867b; --das:#71cf8e;
+  --a1:#8ccb66; --a2:#5fc8c1; --b1:#7fb0ef; --b2:#b495ee; --c1:#ec84b3;
+  --ok:#6fd1a0; --ok-soft:#173527; --warn:#eab36b; --warn-soft:#3a2b14; --bad:#f2867b; --bad-soft:#3d1d1a;
+  --scrim:rgba(0,0,0,.6); color-scheme:dark }}
+
+html{-webkit-text-size-adjust:100%;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;--acc:var(--pt);--acc-soft:var(--pt-soft);background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.55}
+body[data-lang="de"]{--acc:var(--de);--acc-soft:var(--de-soft)}
+body[data-lang="en"]{--acc:var(--en);--acc-soft:var(--en-soft)}
+body.modal-open{overflow:hidden}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+img{max-width:100%}
+h1,h2,h3{margin:0;text-wrap:balance}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:max(16px,env(safe-area-inset-left,0px));padding-block:18px 56px}
+.muted{color:var(--muted)} .small{font-size:13px} .mono{font-family:var(--f-mono)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.spacer{flex:1}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:center;justify-content:space-between}
+.brand h1{font-family:var(--f-word);font-weight:600;font-size:30px;letter-spacing:-.01em;line-height:1.1}
+.brand h1 .amp{color:var(--acc);font-weight:400;font-style:italic}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.langsw{display:flex;gap:4px;background:var(--sunk);padding:4px;border-radius:12px;flex-wrap:wrap}
+.langsw button{border:0;background:transparent;border-radius:9px;padding:7px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;line-height:1.2;color:var(--muted)}
+.langsw button b{font-family:var(--f-word);font-weight:600;font-size:16px}
+.langsw button small{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.04em}
+.langsw button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.langsw button[data-l="pt"][aria-pressed="true"] b{color:var(--pt)}
+.langsw button[data-l="de"][aria-pressed="true"] b{color:var(--de)}
+.langsw button[data-l="en"][aria-pressed="true"] b{color:var(--en)}
+
+.strip{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center;margin-top:16px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.ring{display:flex;align-items:center;gap:12px}
+.ring svg{width:46px;height:46px;flex:none}
+.ring .t b{font-family:var(--f-mono);font-weight:500;font-size:18px;font-variant-numeric:tabular-nums}
+.ring .t span{display:block;font-size:12px;color:var(--muted)}
+.stat b{display:block;font-family:var(--f-mono);font-weight:500;font-size:18px;font-variant-numeric:tabular-nums;line-height:1.2}
+.stat span{font-size:12px;color:var(--muted)}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:99px;font-size:13px;font-weight:600;background:var(--sunk);color:var(--muted)}
+.badge.on{background:var(--acc);color:var(--on-acc)}
+.badge svg{width:14px;height:14px}
+.sync{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);border:0;background:none;cursor:pointer;padding:0}
+.sync i{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.sync.warn i{background:var(--warn)}
+.banner{margin-top:12px;padding:10px 14px;border-radius:10px;background:var(--warn-soft);color:var(--warn);font-size:13.5px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+/* tabs */
+nav.tabs{display:flex;gap:4px;margin:18px 0 18px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line)}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs button{border:0;background:transparent;padding:10px 14px;cursor:pointer;color:var(--muted);font-weight:600;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px}
+nav.tabs button span{font-family:var(--f-mono);font-weight:400;font-size:11px;margin-left:5px}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--acc)}
+nav.tabs button:not([aria-selected="true"]):hover{color:var(--ink)}
+
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:22px;align-items:start}
+.grid.one{grid-template-columns:minmax(0,1fr)}
+@media (max-width:880px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;min-width:0}
+.side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.side .panel{padding:16px}
+.side h3,.panel h3.ph3{font-size:14px;font-weight:700;margin-bottom:10px}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;min-width:0}
+.field:last-child{margin-bottom:0}
+.field > label,.field > .lab2,.lab2{font-size:13px;font-weight:600}
+.checks{display:flex;flex-wrap:wrap;gap:6px}
+.checks label{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid var(--line);border-radius:8px;cursor:pointer;font-size:13px;background:var(--bg)}
+.checks input{accent-color:var(--acc);margin:0}
+.checks label:has(input:checked){border-color:var(--acc);background:var(--acc-soft)}
+.tog{display:flex;gap:8px;align-items:flex-start;font-size:13px;cursor:pointer}
+.tog input{accent-color:var(--acc);margin-top:3px}
+input[type=text],input[type=password],select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%;min-width:0;font-size:16px}
+@media (min-width:700px){input[type=text],input[type=password],select,textarea{font-size:15px}}
+textarea{resize:vertical;min-height:84px}
+textarea.mono{font-family:var(--f-mono);font-size:13px}
+input[type=range]{accent-color:var(--acc);width:100%}
+.stepper{display:flex;align-items:center;gap:6px}
+.stepper button{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:var(--bg);cursor:pointer;font-weight:700}
+.stepper output{font-family:var(--f-mono);font-size:20px;min-width:3ch;text-align:center;font-variant-numeric:tabular-nums}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:9px;cursor:pointer;font-weight:600;font-size:14px;white-space:nowrap}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--acc);border-color:var(--acc);color:var(--on-acc)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+.btn.ghost:hover{background:var(--sunk);color:var(--ink)}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.rec{background:var(--bad);border-color:var(--bad);color:#fff}
+.btn.sm{padding:5px 10px;font-size:13px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn svg{width:16px;height:16px}
+.ib{width:36px;height:36px;padding:0;border-radius:50%;border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.ib:hover{background:var(--sunk);color:var(--ink)}
+.ib svg{width:18px;height:18px}
+.ib.on{color:var(--warn)}
+.ib.me{color:var(--acc)}
+.ib.sm{width:30px;height:30px} .ib.sm svg{width:15px;height:15px}
+
+.chip{display:inline-flex;align-items:center;font-family:var(--f-mono);font-size:11px;padding:2px 7px;border-radius:5px;background:var(--sunk);color:var(--muted);letter-spacing:.02em;white-space:nowrap}
+.lv{font-family:var(--f-mono);font-size:11px;font-weight:500;padding:2px 7px;border-radius:5px;color:var(--surface);white-space:nowrap}
+.lv-A1{background:var(--a1)} .lv-A2{background:var(--a2)} .lv-B1{background:var(--b1)} .lv-B2{background:var(--b2)} .lv-C1{background:var(--c1)}
+.stg{font-size:11.5px;font-weight:600;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.stg i{width:8px;height:8px;border-radius:2px;background:var(--sunk);border:1px solid var(--line)}
+.stg.s1 i{background:var(--warn);border-color:var(--warn)}
+.stg.s2 i{background:var(--acc-soft);border-color:var(--acc)}
+.stg.s3 i{background:var(--acc);border-color:var(--acc);opacity:.7}
+.stg.s4 i{background:var(--acc);border-color:var(--acc)}
+.chip.new{background:var(--warn-soft);color:var(--warn)}
+.chip.g-der{background:transparent;border:1px solid var(--der);color:var(--der)}
+.chip.g-die{background:transparent;border:1px solid var(--die);color:var(--die)}
+.art{font-weight:600} .art-der{color:var(--der)} .art-die{color:var(--die)} .art-das{color:var(--das)}
+
+/* session */
+.sesshead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sesshead h2{font-size:16px;font-weight:700}
+.bar{height:5px;background:var(--sunk);border-radius:5px;overflow:hidden;margin-bottom:16px}
+.bar i{display:block;height:100%;background:var(--acc);width:0;transition:width .3s}
+.card{border:1px solid var(--line);border-radius:var(--r);background:var(--bg);min-height:330px;display:flex;flex-direction:column}
+.card-top{display:flex;gap:6px;align-items:center;padding:10px 10px 0 14px;flex-wrap:wrap}
+.card-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;padding:18px 18px 26px}
+.word{font-family:var(--f-word);font-size:clamp(32px,6.5vw,52px);line-height:1.12;overflow-wrap:anywhere;font-weight:400}
+.word.sm{font-size:clamp(26px,5vw,38px)}
+.extra{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.gls{display:flex;flex-direction:column;gap:6px;align-items:center}
+.gl{display:flex;gap:10px;align-items:baseline;justify-content:center;flex-wrap:wrap}
+.gl-k{font-family:var(--f-mono);font-size:10.5px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 5px;letter-spacing:.05em}
+.gl-v{font-size:19px;font-weight:600}
+.gls.big .gl-v{font-size:24px}
+.gl-v.fr,.gl-v.en,.gl-v.def,.gl-v.de{font-family:var(--f-word);font-weight:400}
+.gl-v.def{font-size:16px;max-width:44ch}
+.divider{width:48px;height:1px;background:var(--line);margin:4px 0}
+.ex{max-width:52ch;display:flex;flex-direction:column;gap:3px}
+.ex .t{font-family:var(--f-word);font-size:17px;line-height:1.45}
+.ex .t b{font-weight:600;color:var(--acc)}
+.ex .tr{font-size:13.5px;color:var(--muted)}
+.cimg{width:150px;height:150px;border-radius:14px;overflow:hidden;background:var(--sunk);flex:none}
+.cimg img{width:100%;height:100%;object-fit:cover;display:block}
+.memo{font-size:13.5px;background:var(--acc-soft);color:var(--ink);padding:6px 12px;border-radius:8px;max-width:46ch}
+.memo b{color:var(--acc);font-weight:700;margin-right:4px}
+.mine{max-width:52ch;text-align:left;width:100%;border-top:1px dashed var(--line);padding-top:10px;display:flex;flex-direction:column;gap:4px}
+.mine .h{font-size:11.5px;font-weight:700;color:var(--muted);letter-spacing:.04em}
+.mine .s{font-family:var(--f-word);font-size:15px}
+.mine .s .fx{display:block;font-size:13px;color:var(--ok)}
+.rate{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:14px}
+.rate button{display:flex;flex-direction:column;align-items:center;gap:1px;padding:12px 4px;border-radius:10px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:700}
+.rate button small{font-family:var(--f-mono);font-weight:400;font-size:11px;color:var(--muted)}
+.rate .g0{color:var(--bad)} .rate .g1{color:var(--warn)} .rate .g2{color:var(--ok)} .rate .g3{color:var(--acc)}
+.rate button:hover{background:var(--sunk)}
+.flipbtn{margin-top:14px;width:100%;padding:13px}
+.kbd{font-family:var(--f-mono);font-size:11px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;color:var(--muted);font-weight:400}
+.foot{display:flex;justify-content:space-between;gap:8px;margin-top:10px;font-size:12.5px;color:var(--muted);flex-wrap:wrap;align-items:center}
+.done{text-align:center;padding:36px 12px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.done h2{font-family:var(--f-word);font-weight:600;font-size:30px}
+.done .seal{width:64px;height:64px;border-radius:50%;background:var(--acc);color:var(--on-acc);display:flex;align-items:center;justify-content:center}
+.done .seal svg{width:32px;height:32px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:99px;font-size:13.5px;font-weight:600;z-index:60;max-width:calc(100vw - 32px)}
+
+/* new word */
+.newgrid{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:20px;align-items:start}
+@media (max-width:640px){.newgrid{grid-template-columns:minmax(0,1fr)}}
+.newhead{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.newhead input{flex:1;min-width:180px;font-family:var(--f-word);font-size:20px;padding:10px 12px}
+.newhead select{width:auto}
+.status{min-height:22px;font-size:13px;color:var(--muted);margin:4px 0 14px;display:flex;align-items:center;gap:8px}
+.status.err{color:var(--bad)}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--acc);animation:sp 1s linear infinite;flex:none;display:inline-block;vertical-align:middle}
+@keyframes sp{to{transform:rotate(360deg)}}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 12px}
+@media (max-width:480px){.two{grid-template-columns:minmax(0,1fr)}}
+.imgbox{width:100%;max-width:260px;aspect-ratio:1;border-radius:14px;border:1px dashed var(--line);background:var(--bg);display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-size:13px;overflow:hidden;padding:0}
+.imgbox.has{border-style:solid}
+.imgbox img{width:100%;height:100%;object-fit:cover;display:block}
+.imgbox .ph{padding:16px}
+.imgacts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.filebtn{position:relative;overflow:hidden}
+.filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+
+/* recordings */
+.recs{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.recrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:6px 8px;background:var(--bg)}
+.recrow .nm{font-size:13px;font-weight:600;min-width:3.5em}
+.recrow .tm{font-family:var(--f-mono);font-size:12px;color:var(--bad)}
+
+/* lists */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+.tbl table{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+.tbl th,.tbl td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:0}
+.tbl th{font-size:12px;color:var(--muted);font-weight:600;background:var(--surface);position:sticky;top:0;z-index:1}
+.tbl td.w{font-family:var(--f-word);font-size:16px}
+.tbl td.w .exs{display:block;font-family:var(--f-word);font-size:13px;color:var(--muted);margin-top:2px}
+.wlink{border:0;background:none;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:left;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+.wlink:hover{text-decoration-color:var(--acc)}
+.tbl .acts{white-space:nowrap;text-align:right}
+.tbl .tag{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--muted);margin-left:6px;font-family:var(--f-ui)}
+.tbl .tag svg{width:12px;height:12px}
+.scroll{max-height:560px;overflow:auto}
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:14px}
+.lvcell{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:6px}
+.lvcell[aria-pressed="true"]{border-color:var(--acc);box-shadow:inset 0 0 0 1px var(--acc)}
+.lvcell .n{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.stack{display:flex;height:7px;border-radius:4px;overflow:hidden;background:var(--sunk)}
+.stack i{display:block;height:100%}
+.stack .k1,.legend i.k1{background:var(--warn)} .stack .k2,.legend i.k2{background:var(--acc-soft);box-shadow:inset 0 0 0 1px var(--acc)} .stack .k3,.legend i.k3{background:var(--acc);opacity:.7} .stack .k4,.legend i.k4{background:var(--acc)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.filters input{flex:1;min-width:160px}
+.filters select{width:auto}
+.empty{padding:30px 16px;text-align:center;color:var(--muted)}
+.empty b{display:block;color:var(--ink);font-size:16px;margin-bottom:4px}
+
+/* stats */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:18px}
+@media (max-width:620px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--bg)}
+.kpi b{display:block;font-family:var(--f-mono);font-size:24px;font-weight:500;font-variant-numeric:tabular-nums}
+.kpi span{font-size:12.5px;color:var(--muted)}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;max-width:420px}
+.cal .h{font-family:var(--f-mono);font-size:10.5px;color:var(--muted);text-align:center}
+.cal .d{aspect-ratio:1;max-width:100%;border-radius:6px;background:var(--sunk);display:flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-size:10.5px;color:var(--muted)}
+.cal .d.act{background:var(--acc-soft);color:var(--ink)}
+.cal .d.chk{background:var(--acc);color:var(--on-acc)}
+.cal .d.today{outline:2px solid var(--ink);outline-offset:-2px}
+.cal .d.blank{background:transparent}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+.lvrows{display:flex;flex-direction:column;gap:12px}
+.lvrow{display:grid;grid-template-columns:44px minmax(0,1fr) 70px;gap:10px;align-items:center}
+.lvrow .stack{height:12px}
+.lvrow .n{font-family:var(--f-mono);font-size:12px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+h3.sec{font-size:15px;font-weight:700;margin:22px 0 10px}
+h3.sec:first-child{margin-top:0}
+.notice{padding:10px 12px;border-radius:8px;background:var(--warn-soft);color:var(--warn);font-size:13px}
+.okbox{padding:10px 12px;border-radius:8px;background:var(--ok-soft);color:var(--ok);font-size:13px}
+.note{font-size:13px;color:var(--muted);margin:0}
+.note + .note{margin-top:6px}
+.note a{color:var(--acc)}
+ol.steps{margin:6px 0 0;padding-left:20px;font-size:13.5px}
+ol.steps li{margin:3px 0}
+
+/* detail modal */
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:40;display:flex;align-items:flex-start;justify-content:center;padding:calc(24px + env(safe-area-inset-top,0px)) 12px calc(24px + env(safe-area-inset-bottom,0px));overflow-y:auto}
+.modal{background:var(--surface);border:1px solid var(--line);border-radius:16px;width:100%;max-width:780px;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.mhead{display:flex;gap:10px;align-items:flex-start;margin-bottom:14px}
+.mhead .word{font-size:clamp(28px,5vw,40px);text-align:left}
+.mgrid{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:20px}
+@media (max-width:640px){.mgrid{grid-template-columns:minmax(0,1fr)}}
+.mgrid .gls{align-items:flex-start}
+.mgrid .gl{justify-content:flex-start}
+.mgrid .ex{text-align:left}
+.sent{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--bg);display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap}
+.sent .body{flex:1;min-width:12em}
+.sent .t{font-family:var(--f-word);font-size:15.5px}
+.sent .fx{font-family:var(--f-word);font-size:14.5px;color:var(--ok);margin-top:3px}
+.sent .nt{font-size:12.5px;color:var(--muted);margin-top:2px}
+.sent.okk .t::after{content:" ✓";color:var(--ok);font-family:var(--f-ui);font-size:13px}
+.sents{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+.confirm{margin-top:10px;padding:12px;border:1px solid var(--bad);border-radius:10px;background:var(--bad-soft);font-size:13.5px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>Palavra <span class="amp">&amp;</span> Wort</h1>
+      <p>私人词汇闪卡 · 巴西葡语 / 德语 / 英语</p>
+    </div>
+    <div class="langsw" role="group" aria-label="学习语言" id="langsw">
+      <button data-l="pt" aria-pressed="true"><b>Português</b><small>A1–C1 · 中 / EN / FR</small></button>
+      <button data-l="de" aria-pressed="false"><b>Deutsch</b><small>A1–C1 · 中 / EN</small></button>
+      <button data-l="en" aria-pressed="false"><b>English</b><small>B1–B2 · 中 / DEF / DE</small></button>
+    </div>
+  </header>
+
+  <section class="strip" aria-label="今日打卡">
+    <div class="ring">
+      <svg viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="19" fill="none" stroke="var(--sunk)" stroke-width="5"/><circle id="ring-arc" cx="23" cy="23" r="19" fill="none" stroke="var(--acc)" stroke-width="5" stroke-linecap="round" stroke-dasharray="0 120" transform="rotate(-90 23 23)"/></svg>
+      <div class="t"><b id="s-new">0 / 15</b><span>今日新词</span></div>
+    </div>
+    <div class="stat"><b id="s-due">0</b><span>待复习</span></div>
+    <div class="stat"><b id="s-streak">0</b><span>连续打卡天数</span></div>
+    <div class="stat"><b id="s-pile">0</b><span>生词堆</span></div>
+    <span class="spacer"></span>
+    <span class="badge" id="s-badge"></span>
+    <button class="sync" id="sync" type="button" title="打开设置里的备份"><i></i><span>保存在本机</span></button>
+  </section>
+  <div class="banner" id="backup-banner" hidden><span id="backup-banner-t"></span><span class="spacer"></span><button class="btn sm" id="backup-banner-go" type="button">现在备份</button></div>
+
+  <nav class="tabs" role="tablist" id="tabs">
+    <button role="tab" data-tab="today" aria-selected="true">今日学习</button>
+    <button role="tab" data-tab="new" aria-selected="false">录入新词</button>
+    <button role="tab" data-tab="pile" aria-selected="false">生词堆<span id="t-pile">0</span></button>
+    <button role="tab" data-tab="browse" aria-selected="false">词库</button>
+    <button role="tab" data-tab="stats" aria-selected="false">进度</button>
+    <button role="tab" data-tab="settings" aria-selected="false">设置与备份</button>
+  </nav>
+
+  <!-- TODAY -->
+  <section id="tab-today" class="grid">
+    <div class="panel">
+      <div class="sesshead"><h2 id="sess-title">今日学习</h2><div class="row" id="sess-actions"></div></div>
+      <div class="bar"><i id="sess-bar"></i></div>
+      <div id="card-area"><div class="empty"><b>正在载入词库…</b></div></div>
+    </div>
+    <aside class="side">
+      <div class="panel">
+        <h3>每日打卡</h3>
+        <div class="field">
+          <span class="lab2">每天新词数 Z</span>
+          <div class="stepper"><button type="button" id="goal-minus" aria-label="减少">−</button><output id="goal-v">15</output><button type="button" id="goal-plus" aria-label="增加">+</button><span class="small muted">个 / 天</span></div>
+        </div>
+        <p class="note">学满 Z 个新词，并把当天到期的复习清零，就算打卡完成。三种语言分别计算。</p>
+      </div>
+      <div class="panel">
+        <h3>新词从哪些级别来</h3>
+        <div class="checks" id="lv-checks"></div>
+        <p class="note" style="margin-top:8px">按级别从低到高依次抽新词，自己录入的词最优先。已经学过的词无论哪个级别，到期都会出现在复习里。</p>
+      </div>
+      <div class="panel">
+        <h3>释义语言</h3>
+        <div class="checks" id="gl-checks"></div>
+        <div class="field" style="margin-top:12px">
+          <span class="lab2">卡片正面</span>
+          <div class="checks">
+            <label><input type="radio" name="dir" value="t2g" id="dir-t2g"> 外语 → 释义</label>
+            <label><input type="radio" name="dir" value="g2t" id="dir-g2t"> 释义 → 外语</label>
+          </div>
+        </div>
+        <div class="field" style="margin-top:4px"><label class="tog"><input type="checkbox" id="opt-imgfront"> 有图片的词，把图片放在正面</label></div>
+      </div>
+      <div class="panel">
+        <h3>声音</h3>
+        <div class="field"><label class="tog"><input type="checkbox" id="opt-autospeak"> 翻到外语时自动朗读（系统语音）</label></div>
+        <div class="field"><label class="tog"><input type="checkbox" id="opt-automine"> 翻面后播放我自己的录音（如果录过）</label></div>
+        <div class="field"><label for="opt-rate" class="small">系统朗读语速 <span class="mono" id="rate-v"></span></label><input type="range" id="opt-rate" min="0.6" max="1.2" step="0.05"></div>
+        <div id="voice-note" class="notice" hidden></div>
+        <div class="field" style="margin-top:12px"><label class="tog"><input type="checkbox" id="opt-autopile"> 评为「忘了」的词自动放进生词堆</label></div>
+        <p class="note" style="margin-top:6px">快捷键：<span class="kbd">空格</span> 翻面 · <span class="kbd">1</span>–<span class="kbd">4</span> 评分 · <span class="kbd">S</span> 朗读 · <span class="kbd">M</span> 我的录音 · <span class="kbd">P</span> 生词堆 · <span class="kbd">E</span> 例句、图片、录音</p>
+      </div>
+    </aside>
+  </section>
+
+  <!-- NEW WORD -->
+  <section id="tab-new" class="grid" hidden>
+    <div class="panel">
+      <div class="sesshead"><h2 id="new-title">录入新词</h2><button class="btn ghost sm" id="n-clear" type="button">清空</button></div>
+      <form id="n-form" autocomplete="off">
+        <div class="newhead">
+          <input type="text" id="n-w" aria-label="单词" required autocapitalize="off" spellcheck="false">
+          <select id="n-lv" aria-label="级别"></select>
+          <button class="btn primary" type="button" id="n-ai"></button>
+        </div>
+        <div class="status" id="n-status"></div>
+        <div class="newgrid">
+          <div>
+            <div class="two">
+              <div class="field"><label for="n-pos">词性</label><select id="n-pos"></select></div>
+              <div class="field"><label for="n-x" id="n-x-lab">变形</label><input type="text" id="n-x"></div>
+            </div>
+            <div id="n-gl"></div>
+            <div class="field"><label for="n-ex">例句</label><input type="text" id="n-ex"></div>
+            <div class="two">
+              <div class="field"><label for="n-exzh">例句中文</label><input type="text" id="n-exzh"></div>
+              <div class="field" id="n-exen-f"><label for="n-exen">例句英文</label><input type="text" id="n-exen"></div>
+            </div>
+            <div class="field"><label for="n-memo">记忆提示</label><input type="text" id="n-memo" placeholder="谐音、画面、词根……"></div>
+            <div class="field"><label for="n-mine">我的例句（每行一句）</label><textarea id="n-mine" rows="3"></textarea></div>
+          </div>
+          <div>
+            <div class="field"><span class="lab2">记忆图片</span></div>
+            <div class="imgbox" id="n-img"><span class="ph">AI 会根据词义画一张插图。也可以上传自己的照片。</span></div>
+            <div class="imgacts">
+              <button class="btn sm" type="button" id="n-draw"></button>
+              <label class="btn sm filebtn">上传图片<input type="file" id="n-file" accept="image/*"></label>
+              <button class="btn ghost sm" type="button" id="n-noimg" hidden>去掉图片</button>
+            </div>
+            <div class="field" style="margin-top:16px"><span class="lab2">我的发音</span></div>
+            <div class="recs" id="n-recs"></div>
+          </div>
+        </div>
+        <div class="row" style="margin-top:8px"><button class="btn primary" type="submit" id="n-save">保存到词库</button><span class="small muted" id="n-msg"></span></div>
+      </form>
+    </div>
+    <aside class="side">
+      <div class="panel">
+        <h3>怎么录入</h3>
+        <p class="note">输入单词，点「AI 补全并配图」。AI 会填好释义、例句、记忆提示，再画一张插图。所有内容都可以改，满意了再保存。</p>
+        <p class="note">也可以不用 AI，自己填写、上传图片，再用麦克风录下自己的发音。</p>
+        <p class="note" id="ai-off" hidden></p>
+      </div>
+      <div class="panel">
+        <h3>批量导入</h3>
+        <p class="note" id="bulk-hint" style="margin-bottom:8px"></p>
+        <textarea id="bulk" class="mono" aria-label="批量导入内容"></textarea>
+        <div class="row" style="margin-top:8px">
+          <select id="bulk-lv" aria-label="导入到哪个级别" style="width:auto"></select>
+          <button class="btn" id="bulk-btn" type="button">导入</button>
+        </div>
+        <p class="small muted" id="bulk-msg" style="margin:8px 0 0"></p>
+      </div>
+    </aside>
+  </section>
+
+  <!-- PILE -->
+  <section id="tab-pile" class="grid" hidden>
+    <div class="panel">
+      <div class="sesshead">
+        <h2 id="pile-title">生词堆</h2>
+        <div class="row">
+          <select id="pile-lv" aria-label="按级别筛选" style="width:auto"></select>
+          <button class="btn primary" id="pile-go">复习生词堆</button>
+        </div>
+      </div>
+      <div id="pile-list"></div>
+    </div>
+    <aside class="side">
+      <div class="panel">
+        <h3>生词堆怎么用</h3>
+        <p class="note">不熟的词点卡片右上角的星标，就会放进生词堆；在词库里也可以直接加。</p>
+        <p class="note">「复习生词堆」不管有没有到期，会把堆里的词全部过一遍。评为「简单」的词会自动移出生词堆，其余的留着下次再练。</p>
+        <p class="note">点单词可以打开详情，给它配图、写例句、录发音。</p>
+      </div>
+      <div class="panel">
+        <h3>掌握程度分级</h3>
+        <div class="lvrows small" id="stage-legend"></div>
+      </div>
+    </aside>
+  </section>
+
+  <!-- BROWSE -->
+  <section id="tab-browse" class="grid one" hidden>
+    <div class="panel">
+      <div class="levels" id="lv-cells"></div>
+      <div class="filters">
+        <input type="text" id="b-search" placeholder="搜索单词或释义…" aria-label="搜索">
+        <select id="b-stage" aria-label="掌握程度"></select>
+        <select id="b-src" aria-label="来源"><option value="">全部词</option><option value="mine">我录入的</option><option value="img">有图片的</option><option value="sent">有我的例句的</option><option value="aud">有我的录音的</option></select>
+        <button class="btn" id="b-cram">复习筛选出的已学词</button>
+      </div>
+      <div class="tbl scroll" id="b-table"></div>
+      <p class="small muted" id="b-count" style="margin:8px 0 0"></p>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section id="tab-stats" class="grid" hidden>
+    <div class="panel" id="stats-main"></div>
+    <aside class="side">
+      <div class="panel">
+        <h3>复习间隔怎么算</h3>
+        <p class="note">每次评分决定下次出现的时间：「忘了」当天重来；「模糊」间隔略增；「记得」按 1 → 3 → 约 7 → 约 18 天递增；「简单」跳得更远。</p>
+        <p class="note">间隔达到 30 天以上的词算「精通」。</p>
+      </div>
+    </aside>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="tab-settings" class="grid" hidden>
+    <div class="side" style="gap:22px">
+      <div class="panel">
+        <h3 class="ph3">备份与恢复</h3>
+        <p class="note">所有内容都保存在这台设备的浏览器里：学习进度、你录入的词、图片、录音和例句。换设备、清理浏览器之前，先导出一份备份文件。</p>
+        <p class="note" id="bk-last"></p>
+        <div class="row" style="margin-top:12px">
+          <button class="btn primary" id="bk-export" type="button">导出备份文件</button>
+          <label class="btn filebtn">导入备份文件<input type="file" id="bk-import" accept=".json,application/json"></label>
+        </div>
+        <div id="bk-confirm"></div>
+        <p class="small muted" id="bk-msg" style="margin:8px 0 0"></p>
+        <p class="note" style="margin-top:10px">从 Claude 里那个版本搬过来：在那边「进度」页点「导出备份」，再在这里导入同一个文件。</p>
+      </div>
+      <div class="panel">
+        <h3 class="ph3">AI 补全、配图、检查例句</h3>
+        <p class="note">这个独立版直接调用 Claude API，需要你自己的 API key（在 <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a> 创建）。API 按用量单独计费，和 Claude 订阅不是同一个账户。</p>
+        <p class="note">key 只保存在这台设备的浏览器里，只发给 api.anthropic.com，不会放进备份文件。</p>
+        <div class="field" style="margin-top:12px"><label for="ai-key">API key</label><input type="password" id="ai-key" placeholder="sk-ant-…" autocomplete="off" spellcheck="false"></div>
+        <div class="field"><label for="ai-model">模型</label>
+          <select id="ai-model">
+            <option value="claude-sonnet-5-5">Claude Sonnet 5.5（推荐：质量和价格均衡）</option>
+            <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5（最快、最便宜）</option>
+            <option value="claude-opus-5-5">Claude Opus 5.5（效果最好、最贵）</option>
+          </select></div>
+        <div class="row"><button class="btn primary" id="ai-save" type="button">保存</button><button class="btn" id="ai-test" type="button">测试连接</button><button class="btn ghost" id="ai-del" type="button">删除 key</button></div>
+        <p class="small" id="ai-msg" style="margin:8px 0 0"></p>
+      </div>
+    </div>
+    <aside class="side">
+      <div class="panel">
+        <h3>装到手机主屏幕</h3>
+        <p class="note"><b>iPhone（Safari）：</b></p>
+        <ol class="steps"><li>用 Safari 打开这个页面</li><li>点底部的「分享」按钮</li><li>选「添加到主屏幕」</li></ol>
+        <p class="note" style="margin-top:8px"><b>安卓（Chrome）：</b></p>
+        <ol class="steps"><li>点右上角菜单 ⋮</li><li>选「安装应用」或「添加到主屏幕」</li></ol>
+        <button class="btn sm" id="install-btn" type="button" style="margin-top:10px" hidden>安装到这台设备</button>
+        <p class="note" style="margin-top:8px">装好以后像 App 一样打开，没网也能复习（AI 功能需要联网）。</p>
+      </div>
+      <div class="panel">
+        <h3>存储</h3>
+        <p class="note" id="st-usage">正在计算…</p>
+        <button class="btn sm" id="st-persist" type="button" style="margin-top:8px">请求长期保存</button>
+        <p class="note" style="margin-top:8px">浏览器空间紧张时可能清理网站数据。点上面的按钮，请浏览器把这里的数据标记为「不要自动删除」。iPhone 上装到主屏幕后更稳妥。</p>
+      </div>
+    </aside>
+  </section>
+</div>
+<div id="detail-root"></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const LANG={
+  pt:{name:"Português",zh:"葡语",ai:"Brazilian Portuguese",tts:"pt-BR",re:/^pt[-_]BR/i,re2:/^pt/i,levels:["A1","A2","B1","B2","C1"],gl:["zh","en","fr"],done:"Muito bem!",ok:"Feito!",theme:"#16785a"},
+  de:{name:"Deutsch",zh:"德语",ai:"German",tts:"de-DE",re:/^de[-_]DE/i,re2:/^de/i,levels:["A1","A2","B1","B2","C1"],gl:["zh","en"],done:"Gut gemacht!",ok:"Geschafft!",theme:"#3f50b0"},
+  en:{name:"English",zh:"英语",ai:"English",tts:"en-GB",re:/^en[-_]GB/i,re2:/^en/i,levels:["B1","B2"],gl:["zh","def","de"],done:"Well done!",ok:"Done for today!",theme:"#a2560a"}
+};
+const GLN={zh:"中文",en:"English",fr:"Français",def:"英文释义",de:"Deutsch"};
+const GLS={zh:"中",en:"EN",fr:"FR",def:"DEF",de:"DE"};
+const STAGES=["未学","学习中","熟悉","掌握","精通"];
+const STAGE_NOTE=["还没学过","刚学或刚忘，间隔 ≤ 2 天","间隔 3–9 天","间隔 10–29 天","间隔 ≥ 30 天"];
+const POSN={v:"动词",adj:"形容词",adv:"副词",prep:"介词","präp":"介词",conj:"连词",konj:"连词",expr:"短语",phr:"短语",pron:"代词",pl:"复数名词",noun:"名词"};
+const POSOPT={
+  pt:[["m","阳性名词"],["f","阴性名词"],["v","动词"],["adj","形容词"],["adv","副词"],["prep","介词"],["conj","连词"],["expr","短语"]],
+  de:[["m","der 名词"],["f","die 名词"],["n","das 名词"],["pl","复数名词"],["v","动词"],["adj","形容词"],["adv","副词"],["präp","介词"],["konj","连词"],["expr","短语"]],
+  en:[["noun","名词"],["v","动词"],["adj","形容词"],["adv","副词"],["phr","短语 / 短语动词"],["prep","介词"],["conj","连词"]]
+};
+const XLAB={pt:["变形 / 备注（可选）",""],de:["复数 / 动词变形","die Regenschirme · fährt ab · fuhr ab · ist abgefahren"],en:["音标","/ˈʌmbrelə/"]};
+const SLOTS=[["w","单词"],["s","例句"]];
+const I={
+ spk:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>',
+ star:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg>',
+ starF:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z"/></svg>',
+ check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+ x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+ pen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg>',
+ img:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg>',
+ mic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
+ play:'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5v14l12-7z"/></svg>',
+ stop:'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>',
+ spark:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></svg>'
+};
+
+/* ---------- state (localStorage) ---------- */
+const LS="palavra-wort-v1";
+const blank=()=>({srs:{},pile:{},custom:[],log:{},imgs:{},mine:{},memo:{},auds:{}});
+const DEF={v:3,settings:{lang:"pt",dir:"t2g",autoPile:true,autoSpeak:false,autoMine:false,imgFront:false,rate:0.95,
+  gloss:{pt:["zh","en","fr"],de:["zh","en"],en:["zh","def"]},goal:{pt:15,de:15,en:15},levels:{pt:["A1","A2"],de:["B2","C1"],en:["B1","B2"]}},
+  pt:blank(),de:blank(),en:blank(),updated:0,lastBackup:0};
+const clone=x=>JSON.parse(JSON.stringify(x));
+function merge(x){
+  const o=clone(DEF); if(!x||typeof x!=="object") return o;
+  const s=x.settings||{};
+  for(const k in s){ if(k==="gloss"||k==="goal"||k==="levels") Object.assign(o.settings[k],s[k]||{}); else o.settings[k]=s[k]; }
+  for(const l of Object.keys(LANG)) if(x[l]) o[l]=Object.assign(blank(),x[l]);
+  if(!LANG[o.settings.lang]) o.settings.lang="pt";
+  o.updated=x.updated||0; o.lastBackup=x.lastBackup||0; return o;
+}
+let S=clone(DEF);
+try{ const r=localStorage.getItem(LS); if(r) S=merge(JSON.parse(r)); }catch(e){}
+let saveWarned=false;
+function save(){
+  S.updated=Date.now();
+  try{ localStorage.setItem(LS,JSON.stringify(S)); }
+  catch(e){ if(!saveWarned){ saveWarned=true; toast("这台设备的存储空间不够，最近的改动没能保存。请先导出备份。"); } }
+  renderBackupHint();
+}
+
+/* ---------- media store (IndexedDB: images + recordings) ---------- */
+const IDB={
+  db:null,
+  open(){ if(this.db) return Promise.resolve(this.db);
+    return new Promise((res,rej)=>{ let rq; try{ rq=indexedDB.open("palavra-wort",1); }catch(e){ rej(e); return; }
+      rq.onupgradeneeded=()=>rq.result.createObjectStore("media");
+      rq.onsuccess=()=>{ this.db=rq.result; res(this.db); }; rq.onerror=()=>rej(rq.error); }); },
+  async tx(mode,fn){ const db=await this.open(); return new Promise((res,rej)=>{ const t=db.transaction("media",mode); const st=t.objectStore("media"); const r=fn(st); t.oncomplete=()=>res(r&&r.result); t.onerror=()=>rej(t.error); t.onabort=()=>rej(t.error); }); },
+  get(k){ return this.tx("readonly",st=>st.get(k)); },
+  put(k,v){ return this.tx("readwrite",st=>st.put(v,k)); },
+  del(k){ return this.tx("readwrite",st=>st.delete(k)); },
+  async keys(){ return this.tx("readonly",st=>st.getAllKeys()); },
+  async clear(){ return this.tx("readwrite",st=>st.clear()); }
+};
+
+/* ---------- helpers ---------- */
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad=n=>String(n).padStart(2,"0");
+const dk=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const today=()=>dk(new Date());
+function addDays(n){ const d=new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate()+n); return dk(d); }
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const lang=()=>S.settings.lang;
+const L=()=>S[lang()];
+const LV=()=>LANG[lang()].levels;
+function lg(){ const k=today(), lo=L().log; return lo[k]||(lo[k]={n:0,r:0,c:false}); }
+const goal=()=>S.settings.goal[lang()];
+const lvSel=()=>S.settings.levels[lang()].filter(v=>LV().includes(v));
+function glSel(){ const g=S.settings.gloss[lang()].filter(k=>LANG[lang()].gl.includes(k)); return g.length?g:["zh"]; }
+let toastT=null;
+function toast(t){ const el=$("#toast"); el.textContent=t; el.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>el.hidden=true,2600); }
+const blobToDataURL=b=>new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=()=>rej(r.error); r.readAsDataURL(b); });
+const newKey=p=>p+"-"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+
+/* ---------- AI (Claude API with the user's own key) ---------- */
+const AIK="palavra-wort-ai";
+function aiCfg(){ try{ return JSON.parse(localStorage.getItem(AIK))||{}; }catch(e){ return {}; } }
+function aiSetCfg(c){ try{ if(c) localStorage.setItem(AIK,JSON.stringify(c)); else localStorage.removeItem(AIK); }catch(e){} }
+let aiState=aiCfg().key?"ready":"off";
+async function claudeCall(prompt,maxTokens){
+  const c=aiCfg(); if(!c.key) throw {code:"no_key"};
+  let r;
+  try{ r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"content-type":"application/json","x-api-key":c.key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+    body:JSON.stringify({model:c.model||"claude-sonnet-5-5",max_tokens:maxTokens||2000,messages:[{role:"user",content:prompt}]})}); }
+  catch(e){ throw {code:"network"}; }
+  if(!r.ok){ let m=""; try{ const j=await r.json(); m=(j.error&&j.error.message)||""; }catch(e){}
+    const code= r.status===401||r.status===403?"bad_key": r.status===429?"rate_limited": r.status===404||/model/i.test(m)&&r.status===400?"bad_model": /credit|balance|billing/i.test(m)?"no_credit": r.status===529||r.status>=500?"overloaded":"upstream_error";
+    throw {code,message:m}; }
+  const j=await r.json();
+  return (j.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("");
+}
+function parseJSON(t){
+  try{ return JSON.parse(t); }catch(e){}
+  const f=t.match(/```(?:json)?\s*([\s\S]*?)```/); if(f){ try{ return JSON.parse(f[1]); }catch(e){} }
+  const a=t.indexOf("{"), b=t.lastIndexOf("}"); if(a>=0&&b>a){ try{ return JSON.parse(t.slice(a,b+1)); }catch(e){} }
+  throw {code:"invalid_json"};
+}
+function aiErr(e){
+  const c=e&&e.code;
+  if(c==="no_key") return "还没有设置 API key，请到「设置与备份」里填写。";
+  if(c==="bad_key") return "API key 不对或已失效，请到「设置与备份」里检查。";
+  if(c==="no_credit") return "API 账户余额不足，请到 console.anthropic.com 充值。";
+  if(c==="bad_model") return "这个模型现在用不了，请到「设置与备份」里换一个。";
+  if(c==="rate_limited") return "请求太频繁，过一会儿再试。";
+  if(c==="overloaded") return "Claude 现在比较忙，过一会儿再试。";
+  if(c==="network") return "连不上 Claude API，检查一下网络。";
+  if(c==="invalid_json") return "AI 返回的格式不对，再点一次试试。";
+  return "AI 暂时没有响应，再试一次。"+(e&&e.message?"（"+e.message+"）":"");
+}
+function refreshAI(){
+  aiState=aiCfg().key?"ready":"off";
+  const n=$("#ai-off"); n.hidden=aiState==="ready"; n.innerHTML='要用 AI 补全和配图，先到「设置与备份」里填上你的 Claude API key。';
+  renderNewButtons(); if(sess&&cur==="today") renderCard();
+}
+
+/* ---------- data ---------- */
+const DATA={pt:null,de:null,en:null}, LOADING={};
+function toCard(l,lv,r){
+  if(l==="pt") return {id:"pt:"+r[0],lang:l,lvl:lv,w:r[0],pos:r[1],extra:"",zh:r[2],en:r[3],fr:r[4],ex:r[5],exzh:r[6],exen:r[7]};
+  if(l==="de") return {id:"de:"+r[0],lang:l,lvl:lv,w:r[0],pos:r[1],extra:r[2],zh:r[3],en:r[4],ex:r[5],exzh:r[6],exen:r[7]};
+  return {id:"en:"+r[0],lang:l,lvl:lv,w:r[0],pos:r[1],extra:r[2],zh:r[3],def:r[4],de:r[5],ex:r[6],exzh:r[7]};
+}
+function loadLang(l){
+  if(DATA[l]) return Promise.resolve(DATA[l]);
+  if(LOADING[l]) return LOADING[l];
+  LOADING[l]=Promise.all(LANG[l].levels.map(lv=>fetch("data/"+l+"-"+lv+".json").then(r=>{ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); }).then(rows=>rows.map(r=>toCard(l,lv,r)))))
+    .then(parts=>{ DATA[l]=parts.flat(); return DATA[l]; })
+    .catch(e=>{ LOADING[l]=null; throw e; });
+  return LOADING[l];
+}
+let ALL=[], BYID=new Map();
+function rebuildCards(){
+  const l=lang(); const own=(S[l].custom||[]).map(c=>Object.assign({lang:l,custom:true},c));
+  ALL=own.concat(DATA[l]||[]); BYID=new Map(ALL.map(c=>[c.id,c]));
+}
+function stage(st){ if(!st) return 0; if(st.r===0||st.i<=2) return 1; if(st.i<10) return 2; if(st.i<30) return 3; return 4; }
+const dueList=()=>{ const t=today(), srs=L().srs; return ALL.filter(c=>srs[c.id]&&srs[c.id].d<=t); };
+function freshPool(){ const srs=L().srs, lv=lvSel(); const out=ALL.filter(c=>c.custom&&!srs[c.id]);
+  for(const v of LV()){ if(!lv.includes(v)) continue; out.push(...ALL.filter(c=>!c.custom&&c.lvl===v&&!srs[c.id])); } return out; }
+const memoOf=c=>L().memo[c.id]||"";
+const mineOf=c=>L().mine[c.id]||[];
+const audsOf=id=>L().auds[id]||{};
+
+/* ---------- images ---------- */
+const MEDC=new Map();
+const toSrc=(kind,data)=>kind==="svg"?"data:image/svg+xml;charset=utf-8,"+encodeURIComponent(data):data;
+async function storeImg(id,kind,data){
+  const old=L().imgs[id]; const key=newKey("img");
+  try{ await IDB.put(key,{kind,data,card:id}); }catch(e){ toast("图片没能保存：这台设备的存储不可用。"); return; }
+  MEDC.set(key,toSrc(kind,data)); L().imgs[id]=key; save();
+  if(old) dropMedia(old);
+}
+function dropMedia(key){ MEDC.delete(key); IDB.del(key).catch(()=>{}); }
+function removeImg(id){ const key=L().imgs[id]; if(!key) return; delete L().imgs[id]; save(); dropMedia(key); }
+async function loadImg(id){
+  const key=L().imgs[id]; if(!key) return null;
+  if(MEDC.has(key)) return MEDC.get(key);
+  try{ const o=await IDB.get(key); if(o){ const s=toSrc(o.kind,o.data); MEDC.set(key,s); return s; } }catch(e){}
+  return null;
+}
+function fillImgs(root){
+  root.querySelectorAll("[data-img]").forEach(el=>{
+    loadImg(el.dataset.img).then(src=>{ if(!el.isConnected) return; if(src){ el.innerHTML=""; const im=new Image(); im.alt=""; im.src=src; el.appendChild(im); el.classList.add("has"); } else if(el.classList.contains("cimg")) el.remove(); });
+  });
+}
+function cleanSvg(text){
+  const m=String(text||"").match(/<svg[\s\S]*<\/svg>/i); if(!m) return null;
+  let s=m[0].replace(/<script[\s\S]*?<\/script>/gi,"").replace(/<foreignObject[\s\S]*?<\/foreignObject>/gi,"").replace(/\son\w+\s*=\s*("[^"]*"|'[^']*')/gi,"").replace(/(href)\s*=\s*("https?:[^"]*"|'https?:[^']*')/gi,"");
+  if(!/xmlns=/.test(s)) s=s.replace(/<svg/i,'<svg xmlns="http://www.w3.org/2000/svg"');
+  if(s.length>60000) return null;
+  return s;
+}
+function fileToJpeg(file){
+  return new Promise((res,rej)=>{
+    const url=URL.createObjectURL(file); const im=new Image();
+    im.onload=()=>{ const max=520, sc=Math.min(1,max/Math.max(im.width,im.height)); const w=Math.round(im.width*sc), h=Math.round(im.height*sc);
+      const cv=document.createElement("canvas"); cv.width=w; cv.height=h; cv.getContext("2d").drawImage(im,0,0,w,h); URL.revokeObjectURL(url);
+      try{ res(cv.toDataURL("image/jpeg",0.8)); }catch(e){ rej(e); } };
+    im.onerror=()=>{ URL.revokeObjectURL(url); rej(new Error("bad image")); };
+    im.src=url;
+  });
+}
+
+/* ---------- recordings ---------- */
+const REC={mr:null,stream:null,chunks:[],target:null,start:0,timer:null,onDone:null};
+const canRecord=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&window.MediaRecorder);
+function pickMime(){ const c=["audio/webm;codecs=opus","audio/mp4","audio/webm","audio/ogg;codecs=opus"]; for(const m of c){ try{ if(MediaRecorder.isTypeSupported(m)) return m; }catch(e){} } return ""; }
+async function startRec(target,onDone){
+  if(REC.mr) stopRec();
+  if(!canRecord){ toast("这个浏览器不支持录音。可以上传录好的音频文件。"); return false; }
+  try{ REC.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}}); }
+  catch(e){ toast(e&&e.name==="NotAllowedError"?"没有麦克风权限。请在浏览器设置里允许这个网站使用麦克风。":"打不开麦克风。"); return false; }
+  const mime=pickMime(); REC.chunks=[]; REC.target=target; REC.onDone=onDone; REC.start=Date.now();
+  REC.mr=new MediaRecorder(REC.stream,mime?{mimeType:mime}:undefined);
+  REC.mr.ondataavailable=e=>{ if(e.data&&e.data.size) REC.chunks.push(e.data); };
+  REC.mr.onstop=async()=>{
+    const type=REC.mr&&REC.mr.mimeType||mime||"audio/webm"; const blob=new Blob(REC.chunks,{type});
+    REC.stream&&REC.stream.getTracks().forEach(t=>t.stop());
+    const cb=REC.onDone, tgt=REC.target; clearInterval(REC.timer); REC.mr=null; REC.stream=null; REC.target=null; REC.onDone=null;
+    if(blob.size>0&&cb) cb(blob,tgt);
+  };
+  REC.mr.start();
+  REC.timer=setInterval(()=>{ const el=document.querySelector("[data-rectime]"); if(el) el.textContent=((Date.now()-REC.start)/1000).toFixed(0)+" 秒"; if(Date.now()-REC.start>30000) stopRec(); },250);
+  return true;
+}
+function stopRec(){ if(REC.mr&&REC.mr.state!=="inactive") REC.mr.stop(); }
+function cancelRec(){ if(REC.mr){ REC.onDone=null; stopRec(); } }
+async function storeAud(id,slot,blob){
+  const data=await blobToDataURL(blob); const key=newKey("aud");
+  try{ await IDB.put(key,{kind:"audio",data,card:id}); }catch(e){ toast("录音没能保存：这台设备的存储不可用。"); return; }
+  MEDC.set(key,data);
+  const a=L().auds[id]||(L().auds[id]={}); const old=a[slot]; a[slot]=key; save(); if(old) dropMedia(old);
+}
+function removeAud(id,slot){ const a=L().auds[id]; if(!a||!a[slot]) return; const k=a[slot]; delete a[slot]; if(!Object.keys(a).length) delete L().auds[id]; save(); dropMedia(k); }
+let player=null;
+async function playMedia(key){
+  if(!key) return false;
+  let src=MEDC.get(key);
+  if(!src){ try{ const o=await IDB.get(key); if(o){ src=o.data; MEDC.set(key,src); } }catch(e){} }
+  if(!src) return false;
+  try{ if(hasTTS) speechSynthesis.cancel(); if(player){ player.pause(); } player=new Audio(src); await player.play(); return true; }catch(e){ return false; }
+}
+function playMine(id,prefer){ const a=audsOf(id); return playMedia(a[prefer||"w"]||a.w||a.s); }
+
+/* ---------- AI prompts ---------- */
+const FIELDS={
+  pt:'"w" (canonical form; nouns WITH article o/a; Brazilian spelling), "pos" (one of m|f|v|adj|adv|prep|conj|expr), "extra" (""), "zh" (concise Simplified Chinese gloss), "en" (concise English gloss), "fr" (French equivalent; nouns with article), "ex" (one natural, everyday Brazilian Portuguese sentence using the word), "exzh" (Chinese translation of ex), "exen" (English translation of ex)',
+  de:'"w" (canonical form; nouns WITH article der/die/das), "pos" (one of m|f|n|pl|v|adj|adv|präp|konj|expr), "extra" (nouns: plural like "die Tische", or "—" if none; verbs: "3rd sg present · Präteritum · Perfekt" like "fährt ab · fuhr ab · ist abgefahren"; adjectives with irregular comparison: "besser · am besten"; else ""), "zh" (concise Simplified Chinese gloss), "en" (concise English gloss), "ex" (one natural, everyday German sentence using the word), "exzh" (Chinese translation of ex), "exen" (English translation of ex)',
+  en:'"w" (canonical form), "pos" (one of noun|v|adj|adv|phr|prep|conj), "extra" (British IPA between slashes), "zh" (concise Simplified Chinese gloss), "def" (short learner-dictionary definition in simple English), "de" (German equivalent; nouns with article), "ex" (one natural, everyday English sentence using the word), "exzh" (Chinese translation of ex)'
+};
+function entryPrompt(l,w){
+  return `You are making a vocabulary flashcard for a Chinese-speaking learner who also speaks German, English and French well. Target language: ${LANG[l].ai}.
+The learner typed: "${w}". If it is misspelled or inflected, use the correct dictionary form.
+Reply with ONLY one JSON object with these keys: ${FIELDS[l]}, "level" (CEFR estimate, one of ${LANG[l].levels.map(x=>'"'+x+'"').join(", ")}; pick the closest), "memo" (one vivid memory hook in Simplified Chinese, at most 40 characters: a sound-alike, a mental image, or a cognate/root link to Chinese, German, English or French).`;
+}
+function imgPrompt(l,c,memo){
+  const mean=[c.zh,c.en||c.def].filter(Boolean).join(" / ");
+  return `Draw an illustration that helps a learner remember the ${LANG[l].ai} word "${c.w}" (meaning: ${mean}).${memo?` Memory hook to visualise if it helps: ${memo}.`:""}
+Rules: reply with ONLY one <svg> element and nothing else. Use xmlns="http://www.w3.org/2000/svg", viewBox="0 0 240 240", width="240", height="240". Start with a full-size background <rect>. Flat, friendly, colourful style with bold simple shapes and one clear focal subject or scene that shows the meaning concretely; for abstract words show a typical everyday situation with people or objects. No text, letters or numbers anywhere. No <image>, external links, fonts or scripts. Keep it under 7000 characters.`;
+}
+async function aiEntry(l,w){ return parseJSON(await claudeCall(entryPrompt(l,w),1500)); }
+async function aiImage(l,c,memo){ const s=cleanSvg(await claudeCall(imgPrompt(l,c,memo),8000)); if(!s) throw {code:"invalid_json"}; return s; }
+async function aiCheck(l,c,s){
+  return parseJSON(await claudeCall(`A learner of ${LANG[l].ai} wrote this example sentence to practise "${c.w}" (${c.zh||""} / ${c.en||c.def||""}):
+"${s}"
+Check grammar, spelling, word choice and naturalness${l==="pt"?" (Brazilian Portuguese)":l==="en"?" (British or American English both fine)":""}. Reply with ONLY JSON: {"ok": true if it is already correct and natural else false, "fixed": "the corrected natural version (identical to the input if ok)", "note": "a short explanation in Simplified Chinese, at most 60 characters"}.`,800));
+}
+
+/* ---------- speech ---------- */
+const hasTTS="speechSynthesis" in window; let VOICES=[];
+function loadVoices(){ if(!hasTTS) return; VOICES=speechSynthesis.getVoices()||[]; voiceNote(); }
+function pickVoice(){ const d=LANG[lang()]; return VOICES.find(v=>d.re.test(v.lang))||VOICES.find(v=>d.re2.test(v.lang))||null; }
+function voiceNote(){
+  const el=$("#voice-note"); if(!VOICES.length){ el.hidden=true; return; }
+  const v=pickVoice(), d=LANG[lang()];
+  if(!v){ el.hidden=false; el.textContent="这台设备没有"+d.zh+"语音，系统朗读会不准。可以在系统的「语音 / 文字转语音」设置里添加 "+d.tts+" 语音，或者用自己的录音。"; }
+  else if(lang()==="pt"&&!/BR/i.test(v.lang)){ el.hidden=false; el.textContent="只找到欧洲葡语语音（"+v.lang+"），口音和巴西不同。可以在系统设置里添加「葡萄牙语（巴西）」。"; }
+  else el.hidden=true;
+}
+if(hasTTS){ loadVoices(); speechSynthesis.onvoiceschanged=loadVoices; }
+function speak(t){
+  if(!hasTTS||!t) return;
+  try{ if(player) player.pause(); speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t.replace(/\s*\/\s*/g,", ").replace(/…/g,", "));
+    const v=pickVoice(); u.lang=v?v.lang:LANG[lang()].tts; if(v) u.voice=v; u.rate=S.settings.rate; speechSynthesis.speak(u); }catch(e){}
+}
+
+/* ---------- rendering bits ---------- */
+function wordHTML(c){
+  if(c.lang==="de"){ const m=c.w.match(/^(der|die|das)\s+(.+)$/); if(m) return `<span class="art art-${m[1]}">${m[1]}</span> ${esc(m[2])}`; }
+  return esc(c.w);
+}
+function posChip(c){
+  if(c.lang==="pt"&&(c.pos==="m"||c.pos==="f")) return `<span class="chip g-${c.pos==="m"?"der":"die"}">${c.pos==="m"?"阳性 m.":"阴性 f."}</span>`;
+  if(c.lang==="de"&&["m","f","n"].includes(c.pos)) return "";
+  if(POSN[c.pos]) return `<span class="chip">${POSN[c.pos]}</span>`;
+  return "";
+}
+const glRow=(c,k)=>`<div class="gl"><span class="gl-k">${GLS[k]}</span><span class="gl-v ${k}">${esc(c[k])}</span></div>`;
+function glossHTML(c,big,all){
+  const keys=all?LANG[c.lang].gl:glSel();
+  const rows=keys.filter(k=>c[k]).map(k=>glRow(c,k));
+  if(!rows.length){ const k=LANG[c.lang].gl.find(k=>c[k]); if(k) rows.push(glRow(c,k)); }
+  return `<div class="gls${big?" big":""}">${rows.join("")}</div>`;
+}
+function firstGloss(c){ for(const k of glSel()) if(c[k]) return c[k]; return c.zh||c.en||c.def||""; }
+function highlight(ex,w){
+  const e=esc(ex); let core=w.replace(/^(der|die|das|o|a|os|as)\s+/i,"").split(/\s*[\/…]\s*/)[0].trim();
+  core=core.replace(/^sich\s+/,"").split(" ")[0];
+  if(core.length<3) return e;
+  const stem=core.length>5?core.slice(0,core.length-2):core;
+  const re=new RegExp("(\\p{L}*"+stem.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\p{L}*)","iu");
+  return e.replace(re,"<b>$1</b>");
+}
+function exHTML(c,all){
+  if(!c.ex) return "";
+  const sel=all?["zh","en"]:glSel(); const tr=[]; if(sel.includes("zh")&&c.exzh) tr.push(c.exzh); if((sel.includes("en")||sel.includes("fr"))&&c.exen) tr.push(c.exen);
+  if(!tr.length&&(c.exzh||c.exen)) tr.push(c.exzh||c.exen);
+  return `<div class="ex"><div class="t">${highlight(c.ex,c.w)}</div>${tr.map(t=>`<div class="tr">${esc(t)}</div>`).join("")}</div>`;
+}
+const stgHTML=st=>{ const s=stage(st); return `<span class="stg s${s}"><i></i>${STAGES[s]}</span>`; };
+function preview(st,g){
+  if(g===0) return "今天";
+  st=st||{e:2.5,i:0,r:0}; let i;
+  if(g===1) i=Math.max(1,Math.round((st.i||1)*1.2));
+  else if(g===2) i= st.r===0?1 : st.r===1?3 : Math.round(st.i*st.e);
+  else i= st.r===0?4 : Math.round(Math.max(st.i,1)*st.e*1.3);
+  return i===1?"1 天": i<30? i+" 天" : (Math.round(i/3)/10)+" 个月";
+}
+
+/* ---------- session ---------- */
+let sess=null;
+function buildDaily(){
+  const due=shuffle(dueList()); const need=Math.max(0,goal()-lg().n);
+  const fresh=freshPool().slice(0,need);
+  const own=fresh.filter(c=>c.custom), std=fresh.filter(c=>!c.custom);
+  const nw=own.concat(LV().map(v=>shuffle(std.filter(c=>c.lvl===v))).flat());
+  const q=[]; let i=0,j=0;
+  while(i<due.length||j<nw.length){ for(let k=0;k<3&&i<due.length;k++) q.push({c:due[i++]}); if(j<nw.length) q.push({c:nw[j++],isNew:true}); }
+  sess={mode:"daily",title:"今日学习",queue:q,total:q.length,done:0,cur:null,flipped:false};
+  next();
+}
+function buildExtra(n){
+  const fresh=freshPool().slice(0,n);
+  sess={mode:"extra",title:"加练新词",queue:fresh.map(c=>({c,isNew:true})),total:fresh.length,done:0,cur:null,flipped:false};
+  next();
+}
+function startCram(list,title,mode){
+  if(!list.length){ toast("没有可以复习的词"); return; }
+  const srs=L().srs;
+  sess={mode:mode||"cram",title,queue:shuffle(list.slice()).map(c=>({c,isNew:!srs[c.id]})),total:list.length,done:0,cur:null,flipped:false};
+  showTab("today"); next();
+}
+function next(){ sess.cur=sess.queue.shift()||null; sess.flipped=false; renderCard(); if(sess.cur&&S.settings.autoSpeak&&S.settings.dir==="t2g") speak(sess.cur.c.w); }
+function flip(){
+  if(!sess||!sess.cur||sess.flipped) return; sess.flipped=true; renderCard();
+  const id=sess.cur.c.id;
+  if(S.settings.autoMine&&(audsOf(id).w||audsOf(id).s)) playMine(id);
+  else if(S.settings.autoSpeak&&S.settings.dir==="g2t") speak(sess.cur.c.w);
+}
+function grade(g){
+  if(!sess||!sess.cur||!sess.flipped) return;
+  const c=sess.cur.c, LL=L(), log=lg();
+  let st=LL.srs[c.id]; const isNew=!st;
+  if(!st) st={e:2.5,i:0,r:0,l:0};
+  if(g===0){ st.l=(st.l||0)+1; st.e=Math.max(1.3,st.e-0.2); st.i=0; st.r=0; st.d=today();
+    if(S.settings.autoPile&&!LL.pile[c.id]) LL.pile[c.id]=Date.now(); }
+  else{
+    if(g===1){ st.i=Math.max(1,Math.round((st.i||1)*1.2)); st.e=Math.max(1.3,st.e-0.15); }
+    else if(g===2){ st.i= st.r===0?1 : st.r===1?3 : Math.round(st.i*st.e); }
+    else { st.i= st.r===0?4 : Math.round(Math.max(st.i,1)*st.e*1.3); st.e=Math.min(3.2,st.e+0.15); }
+    st.r++; st.d=addDays(st.i);
+  }
+  LL.srs[c.id]=st;
+  if(isNew) log.n++; else log.r++;
+  if(sess.mode==="pile"&&g===3&&LL.pile[c.id]){ delete LL.pile[c.id]; toast("已移出生词堆"); }
+  if(g===0) sess.queue.splice(Math.min(3,sess.queue.length),0,{c});
+  else sess.done++;
+  checkIn(); save(); next(); renderStrip();
+}
+function checkIn(){
+  const log=lg(); if(log.c) return;
+  if((log.n>=goal()||freshPool().length===0) && dueList().length===0 && (log.n+log.r)>0) log.c=true;
+}
+function togglePile(id){
+  const p=L().pile; if(p[id]){ delete p[id]; toast("已移出生词堆"); } else { p[id]=Date.now(); toast("已放进生词堆"); }
+  save(); renderStrip();
+}
+
+function renderCard(){
+  const area=$("#card-area");
+  $("#sess-title").textContent=sess?sess.title:"今日学习";
+  $("#sess-actions").innerHTML= sess&&sess.mode!=="daily" ? `<button class="btn ghost sm" id="back-daily">返回今日学习</button>` : "";
+  const bd=$("#back-daily"); if(bd) bd.onclick=buildDaily;
+  if(!DATA[lang()]) return;
+  $("#sess-bar").style.width= sess&&sess.total? Math.min(100,100*sess.done/sess.total)+"%" : (sess&&!sess.cur?"100%":"0");
+  if(!sess||!sess.cur){ renderDone(area); return; }
+  const it=sess.cur, c=it.c, LL=L(), st=LL.srs[c.id], inPile=!!LL.pile[c.id], dir=S.settings.dir;
+  const hasImg=!!LL.imgs[c.id], memo=memoOf(c), mine=mineOf(c), au=audsOf(c.id), hasAud=!!(au.w||au.s);
+  const top=`<div class="card-top"><span class="lv lv-${esc(c.lvl)}">${esc(c.lvl)}</span>${it.isNew?'<span class="chip new">新词</span>':stgHTML(st)}${c.custom?'<span class="chip">我录入的</span>':""}<span class="spacer"></span>
+    <button class="ib" id="c-edit" aria-label="例句、图片、录音" title="例句、图片、录音 (E)">${I.pen}</button>
+    <button class="ib ${inPile?"on":""}" id="c-pile" aria-label="${inPile?"移出生词堆":"放进生词堆"}" title="${inPile?"移出生词堆":"放进生词堆"} (P)">${inPile?I.starF:I.star}</button>
+    ${hasAud?`<button class="ib me" id="c-mine" aria-label="播放我的录音" title="我的录音 (M)">${I.mic}</button>`:""}
+    <button class="ib" id="c-say" aria-label="系统朗读" title="系统朗读 (S)">${I.spk}</button></div>`;
+  const imgEl=hasImg?`<div class="cimg" data-img="${esc(c.id)}"></div>`:"";
+  const imgFront=hasImg&&S.settings.imgFront;
+  const extra=c.extra&&c.extra!=="—"?`<div class="extra">${esc(c.extra)}</div>`:"";
+  const backBits=()=>`${memo?`<div class="memo"><b>记忆</b>${esc(memo)}</div>`:""}${exHTML(c)}${mine.length?`<div class="mine"><span class="h">我的例句</span>${mine.slice(0,3).map(m=>`<div class="s">${esc(m.t)}${m.fix&&m.fix!==m.t?`<span class="fx">→ ${esc(m.fix)}</span>`:""}</div>`).join("")}</div>`:""}`;
+  let body;
+  if(dir==="t2g"){
+    body=`${imgFront?imgEl:""}<div class="word">${wordHTML(c)}</div><div class="row" style="justify-content:center">${posChip(c)}</div>`;
+    if(sess.flipped) body+=`${extra}<div class="divider"></div>${!imgFront?imgEl:""}${glossHTML(c)}${backBits()}`;
+  } else {
+    body=`${imgFront?imgEl:""}${glossHTML(c,true)}<div class="row" style="justify-content:center">${posChip(c)}</div>`;
+    if(sess.flipped) body+=`<div class="divider"></div>${!imgFront?imgEl:""}<div class="word sm">${wordHTML(c)}</div>${extra}${backBits()}`;
+  }
+  const actions= sess.flipped
+    ? `<div class="rate">
+        <button class="g0" data-g="0">忘了<small>${preview(st,0)} · 1</small></button>
+        <button class="g1" data-g="1">模糊<small>${preview(st,1)} · 2</small></button>
+        <button class="g2" data-g="2">记得<small>${preview(st,2)} · 3</small></button>
+        <button class="g3" data-g="3">简单<small>${preview(st,3)} · 4</small></button></div>`
+    : `<button class="btn primary flipbtn" id="c-flip">显示答案 <span class="kbd" style="color:inherit;border-color:currentColor;opacity:.75">空格</span></button>`;
+  area.innerHTML=`<div class="card">${top}<div class="card-body">${body}</div></div>${actions}
+    <div class="foot"><span>本轮剩余 ${sess.queue.length+1} 张</span>${sess.flipped&&!hasImg&&!mine.length&&!hasAud?`<button class="btn ghost sm" id="c-add">${I.pen} 例句 / 配图 / 录音</button>`:`<span>${sess.mode==="pile"?"评「简单」会移出生词堆":""}</span>`}</div>`;
+  fillImgs(area);
+  $("#c-say").onclick=()=>speak(sess.flipped&&c.ex?c.w+". "+c.ex:c.w);
+  const cm=$("#c-mine"); if(cm) cm.onclick=()=>playMine(c.id,sess.flipped&&au.s?"s":"w");
+  $("#c-pile").onclick=()=>{ togglePile(c.id); renderCard(); };
+  $("#c-edit").onclick=()=>openDetail(c.id);
+  const ad=$("#c-add"); if(ad) ad.onclick=()=>openDetail(c.id);
+  const f=$("#c-flip"); if(f) f.onclick=flip;
+  area.querySelectorAll(".rate button").forEach(b=>b.onclick=()=>grade(+b.dataset.g));
+}
+function renderDone(area){
+  const log=lg(), d=LANG[lang()], fp=freshPool().length, due=dueList().length;
+  let h;
+  if(sess&&sess.mode!=="daily"){
+    h=`<div class="done"><h2>${d.done}</h2><p class="muted">「${esc(sess.title)}」这一轮做完了。</p>
+      <div class="row" style="justify-content:center;margin-top:8px"><button class="btn primary" id="d-back">回到今日学习</button></div></div>`;
+  } else if(log.c){
+    h=`<div class="done"><div class="seal">${I.check}</div><h2>${d.ok}</h2><p class="muted">今天的${d.zh}打卡完成：新学 ${log.n} 个，复习 ${log.r} 次。连续打卡 ${streak()} 天。</p>
+      <div class="row" style="justify-content:center;margin-top:8px">${fp?`<button class="btn" id="d-more">再学 5 个新词</button>`:""}${Object.keys(L().pile).length?`<button class="btn" id="d-pile">复习生词堆</button>`:""}<button class="btn" id="d-new">录入新词</button></div></div>`;
+  } else if(fp===0&&due===0){
+    h=`<div class="done"><h2>选中的级别学完了</h2><p class="muted">在右边「新词从哪些级别来」里勾选其他级别，或者去「录入新词」加自己的词。</p></div>`;
+  } else {
+    h=`<div class="done"><h2>${d.done}</h2><p class="muted">今天这轮做完了。还差一点就能打卡：新词 ${log.n} / ${goal()}，待复习 ${due}。</p>
+      <div class="row" style="justify-content:center;margin-top:8px"><button class="btn primary" id="d-cont">继续</button></div></div>`;
+  }
+  area.innerHTML=h;
+  const b=(id,fn)=>{ const e=document.getElementById(id); if(e) e.onclick=fn; };
+  b("d-back",buildDaily); b("d-more",()=>buildExtra(5)); b("d-pile",()=>startCram(pileCards(),"复习生词堆","pile")); b("d-cont",buildDaily); b("d-new",()=>showTab("new"));
+}
+document.addEventListener("keydown",e=>{
+  if(detailOpen){ if(e.key==="Escape") closeDetail(); return; }
+  if(cur!=="today"||e.target.matches("input,textarea,select")||e.metaKey||e.ctrlKey||e.altKey) return;
+  if(e.key===" "){ if(sess&&sess.cur){ e.preventDefault(); flip(); } }
+  else if(/^[1-4]$/.test(e.key)) grade(+e.key-1);
+  else if(e.key==="s"||e.key==="S"){ if(sess&&sess.cur) speak(sess.cur.c.w); }
+  else if(e.key==="m"||e.key==="M"){ if(sess&&sess.cur) playMine(sess.cur.c.id); }
+  else if(e.key==="p"||e.key==="P"){ if(sess&&sess.cur){ togglePile(sess.cur.c.id); renderCard(); } }
+  else if(e.key==="e"||e.key==="E"){ if(sess&&sess.cur){ e.preventDefault(); openDetail(sess.cur.c.id); } }
+});
+
+/* ---------- recording widget (shared by detail + new word) ---------- */
+function recRowsHTML(prefix,has){
+  return SLOTS.map(([slot,name])=>{
+    const recNow=REC.target===prefix+":"+slot;
+    return `<div class="recrow"><span class="nm">${name}</span>
+      ${recNow?`<button class="btn rec sm" type="button" data-recstop="${slot}">${I.stop} 停止</button><span class="tm" data-rectime>0 秒</span>`
+        :`<button class="btn sm" type="button" data-rec="${slot}" ${canRecord?"":"disabled"}>${I.mic} ${has[slot]?"重录":"录音"}</button>`}
+      ${has[slot]&&!recNow?`<button class="ib sm me" type="button" data-play="${slot}" aria-label="播放我的${name}录音">${I.play}</button><button class="ib sm" type="button" data-rmrec="${slot}" aria-label="删除${name}录音">${I.x}</button>`:""}
+      <span class="spacer"></span>
+      <label class="btn ghost sm filebtn" title="上传录好的音频">上传<input type="file" accept="audio/*" data-upaud="${slot}"></label></div>`;
+  }).join("")+(canRecord?"":`<p class="note">这个浏览器不支持直接录音，可以上传录好的音频。</p>`);
+}
+
+/* ---------- detail modal ---------- */
+let detailOpen=null;
+function openDetail(id){ const c=BYID.get(id); if(!c) return; detailOpen=id; document.body.classList.add("modal-open"); renderDetail(); }
+function closeDetail(){ cancelRec(); detailOpen=null; document.body.classList.remove("modal-open"); $("#detail-root").innerHTML="";
+  if(cur==="today") renderCard(); else if(cur==="browse") renderBrowse(); else if(cur==="pile") renderPile(); }
+function renderDetail(note){
+  const id=detailOpen, c=BYID.get(id); if(!c) return;
+  const LL=L(), hasImg=!!LL.imgs[id], mine=mineOf(c), ai=aiState==="ready", au=audsOf(id);
+  $("#detail-root").innerHTML=`<div class="scrim" id="d-scrim"><div class="modal" role="dialog" aria-modal="true" aria-label="${esc(c.w)}">
+    <div class="mhead"><div style="flex:1;min-width:0"><div class="row" style="margin-bottom:4px"><span class="lv lv-${esc(c.lvl)}">${esc(c.lvl)}</span>${posChip(c)}${stgHTML(LL.srs[id])}</div>
+      <div class="word">${wordHTML(c)}</div>${c.extra&&c.extra!=="—"?`<div class="extra">${esc(c.extra)}</div>`:""}</div>
+      <button class="ib" id="d-say" aria-label="系统朗读">${I.spk}</button><button class="ib" id="d-close" aria-label="关闭">${I.x}</button></div>
+    <div class="mgrid">
+      <div>
+        ${glossHTML(c,false,true)}
+        <div style="margin-top:12px">${exHTML(c,true)}</div>
+        <div class="field" style="margin-top:16px"><label for="d-memo">记忆提示</label><div class="row" style="flex-wrap:nowrap"><input type="text" id="d-memo" value="${esc(memoOf(c))}" placeholder="谐音、画面、词根……"><button class="btn sm" id="d-memo-save" type="button">保存</button></div></div>
+        <div class="field" style="margin-top:6px"><span class="lab2">我的例句</span>
+          <div class="sents">${mine.length?mine.map((m,i)=>`<div class="sent ${m.ok?"okk":""}"><div class="body"><div class="t">${esc(m.t)}</div>${m.fix&&m.fix!==m.t?`<div class="fx">→ ${esc(m.fix)}</div>`:""}${m.note?`<div class="nt">${esc(m.note)}</div>`:""}</div>
+            ${ai&&!m.note?`<button class="btn ghost sm" data-chk="${i}">AI 检查</button>`:""}${m.fix&&m.fix!==m.t?`<button class="btn ghost sm" data-use="${i}">用改后的</button>`:""}<button class="ib sm" data-say="${i}" aria-label="朗读">${I.spk}</button><button class="ib sm" data-del="${i}" aria-label="删除">${I.x}</button></div>`).join(""):`<p class="note">还没有。用这个词自己造个句子吧。</p>`}</div>
+          <textarea id="d-sent" rows="2" placeholder="用「${esc(c.w)}」造一个句子…"></textarea>
+          <div class="row" style="margin-top:6px"><button class="btn sm" id="d-add" type="button">保存例句</button>${ai?`<button class="btn primary sm" id="d-add-chk" type="button">${I.spark} 保存并让 AI 检查</button>`:""}<span class="small muted" id="d-msg">${note?esc(note):""}</span></div>
+        </div>
+      </div>
+      <div>
+        <span class="lab2">记忆图片</span>
+        <div class="imgbox" id="d-img" style="margin-top:6px" ${hasImg?`data-img="${esc(id)}"`:""}><span class="ph">${hasImg?"载入中…":ai?"还没有图片。可以让 AI 画一张，或上传自己的照片。":"还没有图片。可以上传自己的照片。"}</span></div>
+        <div class="imgacts">
+          ${ai?`<button class="btn sm" id="d-draw" type="button">${I.spark} ${hasImg?"AI 重画":"AI 配图"}</button>`:""}
+          <label class="btn sm filebtn">上传<input type="file" id="d-file" accept="image/*"></label>
+          ${hasImg?`<button class="btn ghost sm" id="d-noimg" type="button">删除图片</button>`:""}
+        </div>
+        <div style="margin-top:18px"><span class="lab2">我的发音</span>
+          <p class="note" style="margin:2px 0 0">先听 <button class="btn ghost sm" id="d-std" type="button">${I.spk} 标准</button> 再录，对比着听。</p>
+          <div class="recs" id="d-recs">${recRowsHTML("d",au)}</div></div>
+      </div>
+    </div>
+    ${c.custom?`<div class="row" style="margin-top:16px;border-top:1px solid var(--line);padding-top:12px"><span class="small muted">这是你录入的词。</span><span class="spacer"></span><button class="btn ghost sm" id="d-delword" type="button">从词库删除</button></div>`:""}
+  </div></div>`;
+  fillImgs($("#detail-root"));
+  const root=$("#detail-root");
+  $("#d-scrim").addEventListener("mousedown",e=>{ if(e.target.id==="d-scrim") closeDetail(); });
+  $("#d-close").onclick=closeDetail;
+  $("#d-say").onclick=()=>speak(c.w);
+  $("#d-std").onclick=()=>speak(c.ex?c.w+". "+c.ex:c.w);
+  $("#d-memo-save").onclick=()=>{ const v=$("#d-memo").value.trim(); if(v) L().memo[id]=v; else delete L().memo[id]; save(); renderDetail("记忆提示已保存"); };
+  const addSent=async check=>{
+    const t=$("#d-sent").value.trim(); if(!t) return;
+    const arr=L().mine[id]||(L().mine[id]=[]); arr.unshift({t,ts:Date.now()}); save(); renderDetail(check?"":"已保存");
+    if(check) await checkSent(c,0);
+  };
+  $("#d-add").onclick=()=>addSent(false);
+  const ac=$("#d-add-chk"); if(ac) ac.onclick=()=>addSent(true);
+  root.querySelectorAll("[data-chk]").forEach(b=>b.onclick=()=>checkSent(c,+b.dataset.chk));
+  root.querySelectorAll("[data-use]").forEach(b=>b.onclick=()=>{ const m=mineOf(c)[+b.dataset.use]; m.t=m.fix; m.ok=true; save(); renderDetail("已改用修改后的句子"); });
+  root.querySelectorAll(".sent [data-del]").forEach(b=>b.onclick=()=>{ const arr=mineOf(c); arr.splice(+b.dataset.del,1); if(!arr.length) delete L().mine[id]; save(); renderDetail(); });
+  root.querySelectorAll(".sent [data-say]").forEach(b=>b.onclick=()=>{ const m=mineOf(c)[+b.dataset.say]; speak(m.fix||m.t); });
+  bindRecs($("#d-recs"),"d",{
+    has:()=>audsOf(id),
+    save:async(slot,blob)=>{ await storeAud(id,slot,blob); if(detailOpen===id) renderDetail("录音已保存"); },
+    play:slot=>playMedia(audsOf(id)[slot]),
+    remove:slot=>{ removeAud(id,slot); renderDetail("录音已删除"); },
+    rerender:()=>{ if(detailOpen===id) renderDetail(); }
+  });
+  const dr=$("#d-draw"); if(dr) dr.onclick=async()=>{
+    dr.disabled=true; const box=$("#d-img"); box.innerHTML=`<span class="ph"><span class="spin"></span> 正在画…（通常 10–60 秒）</span>`;
+    try{ const svg=await aiImage(lang(),c,memoOf(c)); await storeImg(id,"svg",svg); if(detailOpen===id) renderDetail("图片已保存"); }
+    catch(e){ if(detailOpen===id) renderDetail(aiErr(e)); }
+  };
+  $("#d-file").onchange=async e=>{ const f=e.target.files&&e.target.files[0]; if(!f) return;
+    try{ const data=await fileToJpeg(f); await storeImg(id,"jpg",data); renderDetail("图片已保存"); }catch(err){ renderDetail("这张图片读不出来，换一张试试。"); } };
+  const ni=$("#d-noimg"); if(ni) ni.onclick=()=>{ removeImg(id); renderDetail("图片已删除"); };
+  const dw=$("#d-delword"); if(dw) dw.onclick=()=>{
+    if(dw.dataset.sure!=="1"){ dw.dataset.sure="1"; dw.textContent="再点一次确认删除"; dw.classList.remove("ghost"); dw.classList.add("danger"); return; }
+    const LL=L(); LL.custom=LL.custom.filter(x=>x.id!==id); delete LL.srs[id]; delete LL.pile[id]; delete LL.mine[id]; delete LL.memo[id]; removeImg(id);
+    SLOTS.forEach(([s])=>removeAud(id,s));
+    save(); rebuildCards(); closeDetail(); renderStrip(); toast("已从词库删除");
+  };
+}
+function bindRecs(box,prefix,h){
+  box.querySelectorAll("[data-rec]").forEach(b=>b.onclick=async()=>{
+    const slot=b.dataset.rec;
+    const ok=await startRec(prefix+":"+slot,async blob=>{ await h.save(slot,blob); });
+    if(ok) h.rerender();
+  });
+  box.querySelectorAll("[data-recstop]").forEach(b=>b.onclick=()=>stopRec());
+  box.querySelectorAll("[data-play]").forEach(b=>b.onclick=()=>h.play(b.dataset.play));
+  box.querySelectorAll("[data-rmrec]").forEach(b=>b.onclick=()=>h.remove(b.dataset.rmrec));
+  box.querySelectorAll("[data-upaud]").forEach(inp=>inp.onchange=async e=>{ const f=e.target.files&&e.target.files[0]; if(!f) return;
+    if(f.size>3*1024*1024){ toast("音频太大了（超过 3 MB），请录短一点。"); return; }
+    await h.save(inp.dataset.upaud,f); });
+}
+async function checkSent(c,i){
+  const m=mineOf(c)[i]; if(!m) return;
+  const msg=$("#d-msg"); if(msg) msg.innerHTML=`<span class="spin"></span> AI 正在检查…`;
+  try{
+    const r=await aiCheck(lang(),c,m.t);
+    m.ok=!!r.ok; m.fix=String(r.fixed||m.t); m.note=String(r.note||(r.ok?"没问题，很自然。":"")); save();
+    if(detailOpen===c.id) renderDetail(m.ok?"句子没问题":"AI 给了修改建议");
+  }catch(e){ if(detailOpen===c.id) renderDetail(aiErr(e)); }
+}
+
+/* ---------- new word tab ---------- */
+let draft={img:null,auds:{}}, busy=false;
+function renderNewForm(){
+  const l=lang();
+  $("#new-title").textContent="录入新词 · "+LANG[l].name;
+  $("#n-w").placeholder= l==="pt"?"例如：o guarda-chuva":l==="de"?"例如：der Regenschirm":"e.g. umbrella";
+  $("#n-lv").innerHTML=LV().map(v=>`<option>${v}</option>`).join("");
+  $("#n-pos").innerHTML=`<option value="">（选择）</option>`+POSOPT[l].map(([v,t])=>`<option value="${v}">${t}</option>`).join("");
+  $("#n-x-lab").textContent=XLAB[l][0]; $("#n-x").placeholder=XLAB[l][1];
+  $("#n-gl").innerHTML=`<div class="two">${LANG[l].gl.map(k=>`<div class="field"><label for="n-g-${k}">${GLN[k]}</label><input type="text" id="n-g-${k}"></div>`).join("")}</div>`;
+  $("#n-exen-f").hidden= l==="en";
+  $("#bulk-hint").innerHTML=`每行一个词：<span class="mono">单词 | ${LANG[l].gl.map(k=>GLN[k]).join(" | ")} | 例句</span>，后面几项可以省略。`;
+  $("#bulk").placeholder= l==="pt"? "o guarda-chuva | 雨伞 | umbrella | le parapluie\na geladeira | 冰箱 | fridge" : l==="de"? "der Regenschirm | 雨伞 | umbrella | Nimm einen Regenschirm mit!\ndie Steckdose | 插座 | socket" : "umbrella | 雨伞 | a thing you hold over your head in the rain | der Regenschirm";
+  $("#bulk-lv").innerHTML=LV().map(v=>`<option>${v}</option>`).join("");
+  clearDraft(true);
+  renderNewButtons();
+}
+function renderNewButtons(){
+  const ai=aiState==="ready";
+  const a=$("#n-ai"); a.innerHTML=busy?`<span class="spin"></span> 生成中…`:(ai?`${I.spark} AI 补全并配图`:"AI 未设置"); a.disabled=!ai||busy;
+  const d=$("#n-draw"); d.innerHTML=`${I.spark} ${draft.img?"AI 重画":"AI 画图"}`; d.disabled=!ai||busy; d.hidden=!ai;
+  $("#n-noimg").hidden=!draft.img;
+}
+function renderNewRecs(){
+  const box=$("#n-recs"); const has={}; SLOTS.forEach(([s])=>{ if(draft.auds[s]) has[s]=true; });
+  box.innerHTML=recRowsHTML("n",has);
+  bindRecs(box,"n",{
+    has:()=>has,
+    save:async(slot,blob)=>{ draft.auds[slot]=blob; renderNewRecs(); },
+    play:slot=>{ const b=draft.auds[slot]; if(!b) return; if(player) player.pause(); player=new Audio(URL.createObjectURL(b)); player.play().catch(()=>{}); },
+    remove:slot=>{ delete draft.auds[slot]; renderNewRecs(); },
+    rerender:renderNewRecs
+  });
+}
+function setStatus(t,err,spin){ const s=$("#n-status"); s.className="status"+(err?" err":""); s.innerHTML=(spin?'<span class="spin"></span>':"")+esc(t||""); }
+function draftImg(src){ const b=$("#n-img"); if(src){ b.classList.add("has"); b.innerHTML=""; const im=new Image(); im.alt=""; im.src=src; b.appendChild(im); } else { b.classList.remove("has"); b.innerHTML=`<span class="ph">AI 会根据词义画一张插图。也可以上传自己的照片。</span>`; } renderNewButtons(); }
+function clearDraft(keepWord){
+  if(REC.target&&REC.target.startsWith("n:")) cancelRec();
+  ["n-x","n-ex","n-exzh","n-exen","n-memo","n-mine"].forEach(id=>$("#"+id).value="");
+  LANG[lang()].gl.forEach(k=>{ const el=$("#n-g-"+k); if(el) el.value=""; });
+  $("#n-pos").value=""; if(!keepWord) $("#n-w").value="";
+  draft={img:null,auds:{}}; draftImg(null); renderNewRecs(); setStatus(""); $("#n-msg").textContent="";
+}
+function formCard(){
+  const l=lang(), o={lang:l,w:$("#n-w").value.trim(),lvl:$("#n-lv").value,pos:$("#n-pos").value,extra:$("#n-x").value.trim(),ex:$("#n-ex").value.trim(),exzh:$("#n-exzh").value.trim(),exen:l==="en"?"":$("#n-exen").value.trim()};
+  LANG[l].gl.forEach(k=>o[k]=$("#n-g-"+k).value.trim()); return o;
+}
+function fillForm(r){
+  const l=lang(), set=(id,v)=>{ if(v!=null&&String(v).trim()) $("#"+id).value=String(v).trim(); };
+  set("n-w",r.w); set("n-x",r.extra); set("n-ex",r.ex); set("n-exzh",r.exzh); if(l!=="en") set("n-exen",r.exen); set("n-memo",r.memo);
+  LANG[l].gl.forEach(k=>set("n-g-"+k,r[k]));
+  if(r.pos&&POSOPT[l].some(([v])=>v===r.pos)) $("#n-pos").value=r.pos;
+  if(r.level&&LV().includes(r.level)) $("#n-lv").value=r.level;
+}
+async function drawDraft(){
+  const c=formCard(); if(!c.w){ setStatus("先输入单词。",true); return false; }
+  setStatus("正在画插图…（通常 10–60 秒）",false,true); busy=true; renderNewButtons();
+  try{ const svg=await aiImage(lang(),c,$("#n-memo").value.trim()); draft.img={kind:"svg",data:svg}; draftImg(toSrc("svg",svg)); setStatus("插图画好了。不满意可以重画或上传自己的图片。"); return true; }
+  catch(e){ setStatus(aiErr(e),true); return false; }
+  finally{ busy=false; renderNewButtons(); }
+}
+$("#n-ai").addEventListener("click",async()=>{
+  const w=$("#n-w").value.trim(); if(!w){ setStatus("先输入单词。",true); $("#n-w").focus(); return; }
+  if(aiState!=="ready") return;
+  if(ALL.some(c=>c.w.toLowerCase()===w.toLowerCase())){ setStatus("这个词已经在词库里了，可以在「词库」里点它，直接配图、写例句、录音。",true); return; }
+  busy=true; renderNewButtons(); setStatus("AI 正在补全释义和例句…",false,true);
+  try{ const r=await aiEntry(lang(),w); if(!r||typeof r!=="object") throw {code:"invalid_json"}; fillForm(r); }
+  catch(e){ busy=false; renderNewButtons(); setStatus(aiErr(e),true); return; }
+  busy=false; renderNewButtons();
+  await drawDraft();
+});
+$("#n-draw").addEventListener("click",()=>drawDraft());
+$("#n-file").addEventListener("change",async e=>{ const f=e.target.files&&e.target.files[0]; if(!f) return;
+  try{ const data=await fileToJpeg(f); draft.img={kind:"jpg",data}; draftImg(data); setStatus("已使用你上传的图片。"); }catch(err){ setStatus("这张图片读不出来，换一张试试。",true); } e.target.value=""; });
+$("#n-noimg").addEventListener("click",()=>{ draft.img=null; draftImg(null); });
+$("#n-clear").addEventListener("click",()=>clearDraft(false));
+$("#n-form").addEventListener("submit",async e=>{
+  e.preventDefault(); const o=formCard();
+  if(!o.w){ setStatus("先输入单词。",true); return; }
+  if(!LANG[lang()].gl.some(k=>o[k])){ setStatus("至少填一种释义。",true); return; }
+  if(ALL.some(c=>c.w.toLowerCase()===o.w.toLowerCase())){ setStatus("这个词已经在词库里了。",true); return; }
+  if(REC.target&&REC.target.startsWith("n:")){ setStatus("正在录音，先点「停止」。",true); return; }
+  const id="u:"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  if(!o.pos) o.pos=guessPos(o.w);
+  const LL=L(); const rec={id,lvl:o.lvl,w:o.w,pos:o.pos,extra:o.extra,ex:o.ex,exzh:o.exzh,exen:o.exen}; LANG[lang()].gl.forEach(k=>rec[k]=o[k]);
+  LL.custom.push(rec);
+  const memo=$("#n-memo").value.trim(); if(memo) LL.memo[id]=memo;
+  const sents=$("#n-mine").value.split("\n").map(s=>s.trim()).filter(Boolean); if(sents.length) LL.mine[id]=sents.map(t=>({t,ts:Date.now()}));
+  rebuildCards();
+  if(draft.img) await storeImg(id,draft.img.kind,draft.img.data);
+  for(const [slot] of SLOTS) if(draft.auds[slot]) await storeAud(id,slot,draft.auds[slot]);
+  save(); if(sess&&sess.mode==="daily"&&!sess.flipped) buildDaily(); renderStrip();
+  const w=o.w; clearDraft(false); $("#n-msg").textContent="「"+w+"」已保存，会作为新词优先出现。"; $("#n-w").focus();
+});
+function guessPos(w){ const l=lang(); if(l==="pt"){ if(/^o\s/i.test(w)) return "m"; if(/^a\s/i.test(w)) return "f"; } else if(l==="de"){ const m=w.match(/^(der|die|das)\s/); if(m) return {der:"m",die:"f",das:"n"}[m[1]]; } return ""; }
+$("#bulk-btn").addEventListener("click",()=>{
+  const l=lang(), keys=LANG[l].gl, lv=$("#bulk-lv").value; let ok=0,dup=0,bad=0;
+  $("#bulk").value.split("\n").map(s=>s.trim()).filter(Boolean).forEach(line=>{
+    const p=line.split("|").map(s=>s.trim()); const w=p[0];
+    const rec={id:"u:"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),lvl:lv,w,pos:guessPos(w||""),extra:"",exzh:"",exen:""};
+    keys.forEach((k,i)=>rec[k]=p[1+i]||""); rec.ex=p[1+keys.length]||"";
+    if(!w||!keys.some(k=>rec[k])){ bad++; return; }
+    if(ALL.some(c=>c.w.toLowerCase()===w.toLowerCase())){ dup++; return; }
+    L().custom.push(rec); rebuildCards(); ok++;
+  });
+  if(ok){ save(); $("#bulk").value=""; renderStrip(); }
+  $("#bulk-msg").textContent=`导入 ${ok} 个`+(dup?`，${dup} 个已存在`:"")+(bad?`，${bad} 行缺少单词或释义`:"");
+});
+
+/* ---------- strip ---------- */
+function streak(l){
+  l=l||lang(); const log=S[l].log; let n=0; const d=new Date(); d.setHours(12,0,0,0);
+  if(!(log[dk(d)]&&log[dk(d)].c)) d.setDate(d.getDate()-1);
+  while(log[dk(d)]&&log[dk(d)].c){ n++; d.setDate(d.getDate()-1); }
+  return n;
+}
+function renderStrip(){
+  const log=S[lang()].log[today()]||{n:0,r:0,c:false};
+  const g=goal(), frac=Math.min(1,log.n/g), C=2*Math.PI*19;
+  $("#ring-arc").setAttribute("stroke-dasharray",(frac*C).toFixed(1)+" "+C.toFixed(1));
+  $("#s-new").textContent=log.n+" / "+g;
+  $("#s-due").textContent=DATA[lang()]?dueList().length:"–";
+  $("#s-streak").textContent=streak();
+  const pc=Object.keys(L().pile).length; $("#s-pile").textContent=pc; $("#t-pile").textContent=pc;
+  const b=$("#s-badge"); b.className="badge"+(log.c?" on":""); b.innerHTML=log.c?I.check+"今日已打卡":"今日未打卡";
+}
+function ownCount(){ return Object.keys(LANG).reduce((a,l)=>a+S[l].custom.length+Object.keys(S[l].imgs).length+Object.keys(S[l].auds).length+Object.keys(S[l].mine).length,0); }
+function renderBackupHint(){
+  const days=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/864e5):null;
+  const sy=$("#sync"); sy.querySelector("span").textContent= S.lastBackup? `保存在本机 · ${days===0?"今天":days+" 天前"}备份过` : "保存在本机 · 还没备份";
+  const stale=ownCount()>=5&&(days===null||days>=14);
+  sy.className="sync"+(stale?" warn":"");
+  $("#backup-banner").hidden=!stale;
+  $("#backup-banner-t").textContent= days===null?"你已经录入了一些自己的内容，但还没有备份过。数据只存在这台设备上，建议导出一份备份文件。":`上次备份是 ${days} 天前。建议再导出一份备份文件。`;
+  const bl=$("#bk-last"); if(bl) bl.textContent= S.lastBackup? "上次备份："+new Date(S.lastBackup).toLocaleString("zh-CN") : "还没有备份过。";
+}
+
+/* ---------- pile ---------- */
+function pileCards(){ const p=L().pile, lv=$("#pile-lv").value; return Object.keys(p).map(id=>BYID.get(id)).filter(c=>c&&(!lv||c.lvl===lv)); }
+function rowTags(c){ const LL=L(), a=LL.auds[c.id]; return (LL.imgs[c.id]?`<span class="tag" title="有图片">${I.img}</span>`:"")+((LL.mine[c.id]||[]).length?`<span class="tag" title="有我的例句">${I.pen}${LL.mine[c.id].length}</span>`:"")+(a&&(a.w||a.s)?`<span class="tag" title="有我的录音">${I.mic}</span>`:""); }
+function renderPile(){
+  const p=L().pile, list=pileCards().sort((a,b)=>p[b.id]-p[a.id]);
+  $("#pile-title").textContent="生词堆 · "+LANG[lang()].name;
+  $("#pile-go").textContent="复习生词堆（"+list.length+"）"; $("#pile-go").disabled=!list.length;
+  if(!Object.keys(p).length){ $("#pile-list").innerHTML=`<div class="empty"><b>生词堆还是空的</b>学习时点卡片右上角的星标，或者在词库里点星标，就能把不熟的词放进来。</div>`; return; }
+  if(!list.length){ $("#pile-list").innerHTML=`<div class="empty">这个级别没有生词。</div>`; return; }
+  const srs=L().srs;
+  $("#pile-list").innerHTML=`<div class="tbl scroll"><table><thead><tr><th>单词</th><th>释义</th><th>级别</th><th>掌握</th><th></th></tr></thead><tbody>${
+    list.map(c=>`<tr><td class="w"><button class="wlink" data-open="${esc(c.id)}">${wordHTML(c)}</button>${rowTags(c)}${c.ex?`<span class="exs">${esc(c.ex)}</span>`:""}</td><td>${esc(firstGloss(c))}</td><td><span class="lv lv-${esc(c.lvl)}">${esc(c.lvl)}</span></td><td>${stgHTML(srs[c.id])}</td>
+    <td class="acts"><button class="ib sm" data-say="${esc(c.id)}" aria-label="朗读">${I.spk}</button><button class="ib sm" data-rm="${esc(c.id)}" aria-label="移出生词堆" title="移出生词堆">${I.x}</button></td></tr>`).join("")}</tbody></table></div>`;
+}
+$("#pile-list").addEventListener("click",e=>{
+  const s=e.target.closest("[data-say]"), r=e.target.closest("[data-rm]"), o=e.target.closest("[data-open]");
+  if(o) openDetail(o.dataset.open);
+  if(s){ const c=BYID.get(s.dataset.say); if(c) speak(c.w); }
+  if(r){ delete L().pile[r.dataset.rm]; save(); renderPile(); renderStrip(); }
+});
+$("#pile-lv").addEventListener("change",renderPile);
+$("#pile-go").addEventListener("click",()=>startCram(pileCards(),"复习生词堆","pile"));
+
+/* ---------- browse ---------- */
+let bLevel="";
+function browseRows(){
+  const srs=L().srs, LL=L(), q=$("#b-search").value.trim().toLowerCase(), sf=$("#b-stage").value, src=$("#b-src").value;
+  return ALL.filter(c=>(!bLevel||c.lvl===bLevel)&&(sf===""||String(stage(srs[c.id]))===sf)
+    &&(!src||(src==="mine"&&c.custom)||(src==="img"&&LL.imgs[c.id])||(src==="sent"&&(LL.mine[c.id]||[]).length)||(src==="aud"&&LL.auds[c.id]))
+    &&(!q||[c.w,c.zh,c.en,c.fr,c.def,c.de].some(x=>x&&x.toLowerCase().includes(q))));
+}
+function renderBrowse(){
+  const srs=L().srs;
+  $("#lv-cells").innerHTML=LV().map(v=>{
+    const cs=ALL.filter(c=>c.lvl===v), k=[0,0,0,0,0]; cs.forEach(c=>k[stage(srs[c.id])]++);
+    return `<button class="lvcell" data-lv="${v}" aria-pressed="${bLevel===v}"><span class="row"><span class="lv lv-${v}">${v}</span><span class="n">${cs.length-k[0]} / ${cs.length}</span></span>
+      <span class="stack">${[1,2,3,4].map(s=>cs.length&&k[s]?`<i class="k${s}" style="width:${100*k[s]/cs.length}%"></i>`:"").join("")}</span></button>`;
+  }).join("");
+  const rows=browseRows(), pile=L().pile, gs=glSel();
+  $("#b-table").innerHTML=rows.length?`<table><thead><tr><th>单词</th><th>${gs.map(k=>GLN[k]).join(" / ")}</th><th>级别</th><th>掌握</th><th></th></tr></thead><tbody>${
+    rows.map(c=>`<tr><td class="w"><button class="wlink" data-open="${esc(c.id)}">${wordHTML(c)}</button>${c.extra&&c.extra!=="—"?` <span class="extra">${esc(c.extra)}</span>`:""}${rowTags(c)}${c.ex?`<span class="exs">${esc(c.ex)}</span>`:""}</td>
+      <td>${gs.filter(k=>c[k]).map((k,i)=>i?`<div class="muted small">${esc(c[k])}</div>`:`<div>${esc(c[k])}</div>`).join("")}</td>
+      <td><span class="lv lv-${esc(c.lvl)}">${esc(c.lvl)}</span></td><td>${stgHTML(srs[c.id])}</td>
+      <td class="acts"><button class="ib sm" data-say="${esc(c.id)}" aria-label="朗读">${I.spk}</button><button class="ib sm" data-open="${esc(c.id)}" aria-label="例句、图片、录音" title="例句、图片、录音">${I.pen}</button><button class="ib sm ${pile[c.id]?"on":""}" data-pile="${esc(c.id)}" aria-label="${pile[c.id]?"移出生词堆":"放进生词堆"}" title="${pile[c.id]?"移出生词堆":"放进生词堆"}">${pile[c.id]?I.starF:I.star}</button></td></tr>`).join("")}</tbody></table>`
+    : `<div class="empty">没有符合条件的词。</div>`;
+  const learned=rows.filter(c=>srs[c.id]);
+  $("#b-count").textContent=`显示 ${rows.length} 个词，其中已学 ${learned.length} 个。点单词可以写例句、配图、录发音。`;
+  $("#b-cram").disabled=!learned.length;
+  $("#b-cram").textContent= bLevel?`复习 ${bLevel} 已学词（${learned.length}）`:`复习筛选出的已学词（${learned.length}）`;
+}
+$("#lv-cells").addEventListener("click",e=>{ const b=e.target.closest("[data-lv]"); if(!b) return; bLevel= bLevel===b.dataset.lv?"":b.dataset.lv; renderBrowse(); });
+$("#b-search").addEventListener("input",renderBrowse);
+$("#b-stage").innerHTML=`<option value="">全部掌握程度</option>`+STAGES.map((s,i)=>`<option value="${i}">${s}</option>`).join("");
+$("#b-stage").addEventListener("change",renderBrowse);
+$("#b-src").addEventListener("change",renderBrowse);
+$("#b-cram").addEventListener("click",()=>{
+  const srs=L().srs, list=browseRows().filter(c=>srs[c.id]), sf=$("#b-stage").value;
+  startCram(list,(bLevel?bLevel+" ":"")+(sf!==""?STAGES[+sf]+" ":"")+"分级复习");
+});
+$("#b-table").addEventListener("click",e=>{
+  const s=e.target.closest("[data-say]"), p=e.target.closest("[data-pile]"), o=e.target.closest("[data-open]");
+  if(o){ openDetail(o.dataset.open); return; }
+  if(s){ const c=BYID.get(s.dataset.say); if(c) speak(c.w); }
+  if(p){ togglePile(p.dataset.pile); renderBrowse(); }
+});
+
+/* ---------- stats ---------- */
+function renderStats(){
+  const l=lang(), LL=S[l], srs=LL.srs, d=LANG[l];
+  const days=Object.entries(LL.log), chk=days.filter(([k,v])=>v.c).length;
+  const learned=Object.values(srs).filter(s=>s.r>0||s.i>0).length, mastered=Object.values(srs).filter(s=>stage(s)===4).length;
+  const reviews=days.reduce((a,[k,v])=>a+(v.n||0)+(v.r||0),0);
+  const sents=Object.values(LL.mine).reduce((a,x)=>a+x.length,0), imgs=Object.keys(LL.imgs).length, auds=Object.values(LL.auds).reduce((a,x)=>a+Object.keys(x).length,0);
+  const end=new Date(); end.setHours(12,0,0,0);
+  const wd=(end.getDay()+6)%7; const start=new Date(end); start.setDate(end.getDate()-wd-28);
+  let cells=""; const t=today();
+  for(let i=0;i<35;i++){ const dd=new Date(start); dd.setDate(start.getDate()+i); const k=dk(dd);
+    if(k>t){ cells+=`<div class="d blank"></div>`; continue; }
+    const v=LL.log[k]; const cls=v&&v.c?"chk":v&&(v.n+v.r)>0?"act":"";
+    cells+=`<div class="d ${cls} ${k===t?"today":""}" title="${k}${v?` · 新 ${v.n} · 复习 ${v.r}${v.c?" · 已打卡":""}`:""}">${dd.getDate()}</div>`; }
+  const lvRows=LV().map(v=>{ const cs=ALL.filter(c=>c.lvl===v), k=[0,0,0,0,0]; cs.forEach(c=>k[stage(srs[c.id])]++);
+    return `<div class="lvrow"><span class="lv lv-${v}" style="text-align:center">${v}</span><span class="stack">${[1,2,3,4].map(s=>cs.length&&k[s]?`<i class="k${s}" style="width:${100*k[s]/cs.length}%"></i>`:"").join("")}</span><span class="n">${cs.length-k[0]} / ${cs.length}</span></div>`; }).join("");
+  $("#stats-main").innerHTML=`
+    <h3 class="sec">${d.name} · 总览</h3>
+    <div class="kpis">
+      <div class="kpi"><b>${streak(l)}</b><span>连续打卡天数</span></div>
+      <div class="kpi"><b>${chk}</b><span>累计打卡天数</span></div>
+      <div class="kpi"><b>${learned}</b><span>已学单词</span></div>
+      <div class="kpi"><b>${mastered}</b><span>已精通</span></div>
+    </div>
+    <h3 class="sec">最近五周</h3>
+    <div class="cal">${["一","二","三","四","五","六","日"].map(x=>`<div class="h">${x}</div>`).join("")}${cells}</div>
+    <div class="legend"><span><i style="background:var(--acc)"></i>已打卡</span><span><i style="background:var(--acc-soft)"></i>学了但未打卡</span><span><i style="background:var(--sunk)"></i>没学</span></div>
+    <h3 class="sec">各级别掌握情况</h3>
+    <div class="lvrows">${lvRows}</div>
+    <div class="legend">${[1,2,3,4].map(s=>`<span><i class="k${s}"></i>${STAGES[s]}</span>`).join("")}</div>
+    <p class="note" style="margin-top:14px">累计学习 ${reviews} 次（新词 + 复习）。录入 ${LL.custom.length} 个自己的词，写了 ${sents} 个例句，配了 ${imgs} 张图，录了 ${auds} 段发音。</p>`;
+}
+$("#stage-legend").innerHTML=STAGES.map((s,i)=>`<div class="row" style="gap:10px"><span class="stg s${i}" style="min-width:64px"><i></i>${s}</span><span class="muted">${STAGE_NOTE[i]}</span></div>`).join("");
+
+/* ---------- settings: backup ---------- */
+async function exportBackup(){
+  const msg=$("#bk-msg"); msg.textContent="正在打包…";
+  const media={};
+  try{ const keys=await IDB.keys(); const want=new Set();
+    for(const l of Object.keys(LANG)){ Object.values(S[l].imgs).forEach(k=>want.add(k)); Object.values(S[l].auds).forEach(a=>Object.values(a).forEach(k=>want.add(k))); }
+    for(const k of keys){ if(!want.has(k)) continue; const o=await IDB.get(k); if(o) media[k]={kind:o.kind,data:o.data,card:o.card}; }
+  }catch(e){}
+  S.lastBackup=Date.now(); save();
+  const payload={app:"palavra-wort",format:1,exported:new Date().toISOString(),state:S,media};
+  const blob=new Blob([JSON.stringify(payload)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="palavra-wort-备份-"+today()+".json";
+  document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500);
+  msg.textContent=`已导出（${(blob.size/1024/1024).toFixed(1)} MB）。把这个文件存到网盘或发给自己，换设备时导入。`;
+  renderBackupHint();
+}
+let pendingImport=null;
+$("#bk-export").addEventListener("click",exportBackup);
+$("#backup-banner-go").addEventListener("click",()=>{ showTab("settings"); exportBackup(); });
+$("#sync").addEventListener("click",()=>showTab("settings"));
+$("#bk-import").addEventListener("change",async e=>{
+  const f=e.target.files&&e.target.files[0]; e.target.value=""; if(!f) return;
+  let p; try{ p=JSON.parse(await f.text()); }catch(err){ $("#bk-msg").textContent="这个文件读不出来，不是有效的备份。"; return; }
+  if(!p||p.app!=="palavra-wort"||!p.state){ $("#bk-msg").textContent="这不是 Palavra & Wort 的备份文件。"; return; }
+  pendingImport=p;
+  const st=merge(p.state); const own=Object.keys(LANG).map(l=>`${LANG[l].zh} ${st[l].custom.length} 个自录词、${Object.keys(st[l].srs).length} 个学习记录`).join("；");
+  $("#bk-confirm").innerHTML=`<div class="confirm"><b>导入会替换这台设备上现在的全部数据。</b><br>备份时间：${esc(new Date(p.exported).toLocaleString("zh-CN"))}<br>内容：${esc(own)}；图片和录音 ${Object.keys(p.media||{}).length} 个。
+    <div class="row" style="margin-top:10px"><button class="btn danger sm" id="bk-yes" type="button">确认导入</button><button class="btn ghost sm" id="bk-no" type="button">取消</button></div></div>`;
+  $("#bk-no").onclick=()=>{ pendingImport=null; $("#bk-confirm").innerHTML=""; };
+  $("#bk-yes").onclick=doImport;
+});
+async function doImport(){
+  const p=pendingImport; if(!p) return; pendingImport=null; $("#bk-confirm").innerHTML=""; $("#bk-msg").textContent="正在导入…";
+  try{ await IDB.clear(); for(const [k,v] of Object.entries(p.media||{})) await IDB.put(k,v); }catch(e){ $("#bk-msg").textContent="图片和录音没能导入（存储不可用），学习进度照常导入。"; }
+  MEDC.clear();
+  const keepLang=S.settings.lang; S=merge(p.state); if(!S.lastBackup) S.lastBackup=Date.now(); save();
+  $("#bk-msg").textContent="导入完成。";
+  if(S.settings.lang!==keepLang||true) await applyLang();
+}
+
+/* ---------- settings: AI ---------- */
+function renderAISettings(){
+  const c=aiCfg(); $("#ai-key").value=c.key?c.key:""; $("#ai-model").value=c.model||"claude-sonnet-5-5";
+  if(!$("#ai-model").value) $("#ai-model").value="claude-sonnet-5-5";
+}
+$("#ai-save").addEventListener("click",()=>{
+  const key=$("#ai-key").value.trim(); const m=$("#ai-msg");
+  if(!key){ m.className="small"; m.textContent="请先粘贴 API key。"; return; }
+  aiSetCfg({key,model:$("#ai-model").value}); refreshAI(); m.className="small"; m.style.color="var(--ok)"; m.textContent="已保存在这台设备上。";
+});
+$("#ai-model").addEventListener("change",()=>{ const c=aiCfg(); if(c.key){ c.model=$("#ai-model").value; aiSetCfg(c); } });
+$("#ai-del").addEventListener("click",()=>{ aiSetCfg(null); $("#ai-key").value=""; refreshAI(); const m=$("#ai-msg"); m.style.color=""; m.textContent="key 已从这台设备删除。"; });
+$("#ai-test").addEventListener("click",async()=>{
+  const m=$("#ai-msg"); const key=$("#ai-key").value.trim();
+  if(key&&key!==aiCfg().key) aiSetCfg({key,model:$("#ai-model").value});
+  refreshAI(); m.style.color=""; m.innerHTML='<span class="spin"></span> 正在连接…';
+  try{ const t=await claudeCall('Reply with exactly: OK',10); m.style.color="var(--ok)"; m.textContent="连接成功（"+(aiCfg().model||"")+"）。"+(t?"":""); }
+  catch(e){ m.style.color="var(--bad)"; m.textContent=aiErr(e); }
+});
+
+/* ---------- settings: install & storage ---------- */
+let installEvt=null;
+window.addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); installEvt=e; $("#install-btn").hidden=false; });
+$("#install-btn").addEventListener("click",async()=>{ if(!installEvt) return; installEvt.prompt(); try{ await installEvt.userChoice; }catch(e){} installEvt=null; $("#install-btn").hidden=true; });
+async function renderStorage(){
+  const el=$("#st-usage");
+  try{ const est=navigator.storage&&navigator.storage.estimate?await navigator.storage.estimate():null;
+    const per=navigator.storage&&navigator.storage.persisted?await navigator.storage.persisted():false;
+    el.textContent=(est?`已用 ${(est.usage/1024/1024).toFixed(1)} MB。`:"")+(per?"浏览器已同意长期保存这里的数据。":"还没有设置长期保存。");
+    $("#st-persist").hidden=!!per;
+  }catch(e){ el.textContent="这个浏览器不显示存储用量。"; }
+}
+$("#st-persist").addEventListener("click",async()=>{ try{ const ok=navigator.storage&&navigator.storage.persist?await navigator.storage.persist():false; toast(ok?"已设置长期保存":"浏览器没有同意。装到主屏幕后再试一次。"); }catch(e){} renderStorage(); });
+
+/* ---------- settings: study options ---------- */
+function renderSettings(){
+  const l=lang();
+  $("#goal-v").textContent=goal();
+  $("#lv-checks").innerHTML=LV().map(v=>`<label><input type="checkbox" value="${v}" ${lvSel().includes(v)?"checked":""}> ${v}</label>`).join("");
+  $("#gl-checks").innerHTML=LANG[l].gl.map(k=>`<label><input type="checkbox" value="${k}" ${S.settings.gloss[l].includes(k)?"checked":""}> ${GLN[k]}</label>`).join("");
+  $("#dir-t2g").checked=S.settings.dir==="t2g"; $("#dir-g2t").checked=S.settings.dir==="g2t";
+  $("#opt-autopile").checked=!!S.settings.autoPile; $("#opt-autospeak").checked=!!S.settings.autoSpeak; $("#opt-imgfront").checked=!!S.settings.imgFront; $("#opt-automine").checked=!!S.settings.autoMine;
+  $("#opt-rate").value=S.settings.rate; $("#rate-v").textContent="×"+(+S.settings.rate).toFixed(2);
+  $("#pile-lv").innerHTML=`<option value="">全部级别</option>`+LV().map(v=>`<option>${v}</option>`).join("");
+}
+function setGoal(n){ S.settings.goal[lang()]=Math.max(1,Math.min(100,n)); $("#goal-v").textContent=goal(); save(); renderStrip();
+  if(sess&&sess.mode==="daily"&&(sess.done===0||!sess.cur)&&!sess.flipped) buildDaily(); }
+$("#goal-minus").onclick=()=>setGoal(goal()>5?goal()-5:goal()-1);
+$("#goal-plus").onclick=()=>setGoal(goal()+5);
+$("#lv-checks").addEventListener("change",()=>{ const v=$$("#lv-checks input:checked").map(i=>i.value); S.settings.levels[lang()]=v.length?v:[LV()[0]]; if(!v.length) renderSettings(); save(); if(sess&&sess.mode==="daily") buildDaily(); });
+$("#gl-checks").addEventListener("change",()=>{ const v=$$("#gl-checks input:checked").map(i=>i.value); if(!v.length){ toast("至少保留一种释义语言"); renderSettings(); return; } S.settings.gloss[lang()]=v; save(); renderCard(); });
+$$('input[name="dir"]').forEach(r=>r.addEventListener("change",e=>{ S.settings.dir=e.target.value; save(); if(sess) sess.flipped=false; renderCard(); }));
+$("#opt-autopile").addEventListener("change",e=>{ S.settings.autoPile=e.target.checked; save(); });
+$("#opt-autospeak").addEventListener("change",e=>{ S.settings.autoSpeak=e.target.checked; save(); });
+$("#opt-automine").addEventListener("change",e=>{ S.settings.autoMine=e.target.checked; save(); });
+$("#opt-imgfront").addEventListener("change",e=>{ S.settings.imgFront=e.target.checked; save(); renderCard(); });
+$("#opt-rate").addEventListener("input",e=>{ S.settings.rate=+e.target.value; $("#rate-v").textContent="×"+(+e.target.value).toFixed(2); });
+$("#opt-rate").addEventListener("change",save);
+
+/* ---------- tabs & language ---------- */
+let cur="today";
+const TABS=["today","new","pile","browse","stats","settings"];
+function showTab(t){
+  if(!TABS.includes(t)) t="today";
+  cur=t; $$("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));
+  TABS.forEach(k=>document.getElementById("tab-"+k).hidden=k!==t);
+  if(t==="pile") renderPile(); if(t==="browse") renderBrowse(); if(t==="stats") renderStats();
+  if(t==="settings"){ renderAISettings(); renderStorage(); renderBackupHint(); }
+  if(t==="today"&&sess) renderCard();
+  try{ localStorage.setItem("pw-tab",t); }catch(e){}
+}
+$("#tabs").addEventListener("click",e=>{ const b=e.target.closest("[data-tab]"); if(b) showTab(b.dataset.tab); });
+$("#langsw").addEventListener("click",e=>{ const b=e.target.closest("[data-l]"); if(!b||b.dataset.l===lang()) return; S.settings.lang=b.dataset.l; save(); applyLang(); });
+async function applyLang(){
+  const l=lang(); document.body.dataset.lang=l;
+  const tm=document.querySelector('meta[name="theme-color"]'); if(tm) tm.content=LANG[l].theme;
+  $$("#langsw button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.l===l));
+  if(detailOpen) closeDetail();
+  renderSettings(); renderNewForm(); voiceNote(); renderStrip(); renderBackupHint();
+  if(hasTTS) speechSynthesis.cancel();
+  if(!DATA[l]){ $("#card-area").innerHTML=`<div class="empty"><b>正在载入${LANG[l].zh}词库…</b></div>`; $("#sess-bar").style.width="0"; }
+  try{ await loadLang(l); }
+  catch(e){ $("#card-area").innerHTML=`<div class="empty"><b>词库没有载入</b>请检查网络后刷新页面。（${esc(e.message)}）</div>`; return; }
+  if(lang()!==l) return;
+  rebuildCards(); buildDaily(); renderStrip();
+  if(cur!=="today") showTab(cur);
+}
+
+/* ---------- boot ---------- */
+try{ const t=localStorage.getItem("pw-tab"); if(t) showTab(t); }catch(e){}
+refreshAI();
+applyLang();
+let lastDay=today();
+setInterval(()=>{ if(today()!==lastDay){ lastDay=today(); if(DATA[lang()]){ buildDaily(); renderStrip(); } } },60000);
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible"&&today()!==lastDay){ lastDay=today(); if(DATA[lang()]){ buildDaily(); renderStrip(); } } });
+if("serviceWorker" in navigator&&location.protocol==="https:") navigator.serviceWorker.register("sw.js").catch(()=>{});
+})();
+</script>
+</body>
+</html>
