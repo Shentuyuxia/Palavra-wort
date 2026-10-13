@@ -1,5 +1,5 @@
 // Offline support: serve the app and word lists from cache, refresh them in the background.
-const CACHE = "palavra-wort-v2";
+const CACHE = "palavra-wort-v3";
 const SHELL = [
   "./", "./index.html", "./manifest.webmanifest",
   "./icons/icon.svg", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png", "./icons/favicon-32.png",
